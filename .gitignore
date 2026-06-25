@@ -1,0 +1,19 @@
+# Dependencias de Node.js
+backend/node_modules/
+frontend/node_modules/
+
+# Archivos temporales de carga
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Artefactos de empaquetado
+dist/
+*.zip
+
+# Archivos de entorno
+backend/.env
+frontend/.env
+
+# Archivos del editor
+.DS_Store
+*.log

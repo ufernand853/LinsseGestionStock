@@ -1,0 +1,192 @@
+openapi: 3.0.3
+info:
+  title: Stock Multidepósito API
+  version: 0.2.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/auth/login:
+    post:
+      summary: Login
+      responses:
+        '200':
+          description: OK
+  /api/auth/refresh:
+    post:
+      summary: Refresh access token
+      responses:
+        '200':
+          description: OK
+  /api/users:
+    get:
+      summary: List users
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create user
+      responses:
+        '201':
+          description: Created
+  /api/users/{id}:
+    put:
+      summary: Update user
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Disable user
+      responses:
+        '204':
+          description: No Content
+  /api/roles:
+    get:
+      summary: List roles and permissions
+      responses:
+        '200':
+          description: OK
+  /api/groups:
+    get:
+      summary: List groups
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create group
+      responses:
+        '201':
+          description: Created
+  /api/groups/{id}:
+    put:
+      summary: Update group
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Delete group
+      responses:
+        '204':
+          description: No Content
+  /api/items:
+    get:
+      summary: List items (filters by attributes and group)
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create item
+      responses:
+        '201':
+          description: Created
+  /api/items/{id}:
+    put:
+      summary: Update item
+      responses:
+        '200':
+          description: OK
+  /api/items/overstock:
+    get:
+      summary: List items with positive stock in overstock groups
+      responses:
+        '200':
+          description: OK
+  /api/locations:
+    get:
+      summary: List locations
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create location
+      responses:
+        '201':
+          description: Created
+  /api/locations/{id}:
+    put:
+      summary: Update location
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Delete location
+      responses:
+        '200':
+          description: Deleted
+  /api/stock/request:
+    post:
+      summary: Request a transfer between locations
+      responses:
+        '201':
+          description: Created
+  /api/stock/request/{requestId}/resubmit:
+    post:
+      summary: Resubmit a rejected movement request
+      responses:
+        '200':
+          description: Resubmitted
+  /api/preferences:
+    get:
+      summary: Get authenticated user preferences
+      responses:
+        '200':
+          description: OK
+    put:
+      summary: Update authenticated user preferences
+      responses:
+        '200':
+          description: OK
+  /api/stock/approve/{requestId}:
+    post:
+      summary: Approve and execute movement (requires stock.approve)
+      responses:
+        '200':
+          description: Executed
+  /api/stock/reject/{requestId}:
+    post:
+      summary: Reject movement (requires stock.approve)
+      responses:
+        '200':
+          description: Rejected
+  /api/stock/requests:
+    get:
+      summary: List movement requests
+      responses:
+        '200':
+          description: OK
+  /api/stock/locations:
+    get:
+      summary: List locations with minimal metadata for stock workflows
+      responses:
+        '200':
+          description: OK
+  /api/logs/movements:
+    get:
+      summary: Read movement audit logs
+      responses:
+        '200':
+          description: OK
+  /api/logs/audit:
+    get:
+      summary: Read general audit logs
+      responses:
+        '200':
+          description: OK
+  /api/reports/stock/by-group:
+    get:
+      summary: Stock report grouped by taxonomy
+      responses:
+        '200':
+          description: OK
+  /api/reports/stock/by-deposit:
+    get:
+      summary: Stock report aggregated by location (deprecated alias)
+      responses:
+        '200':
+          description: OK
+  /api/reports/stock/by-location:
+    get:
+      summary: Stock report aggregated by location
+      responses:
+        '200':
+          description: OK
+components: {}
