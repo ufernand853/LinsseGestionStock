@@ -11,6 +11,10 @@ const MovementRequest = require('../models/MovementRequest');
 
 const router = express.Router();
 
+function buildTenantFilter(req) {
+  return req.user?.tenantId ? { tenant: req.user.tenantId } : { tenant: null };
+}
+
 function serializeLocation(location) {
   return {
     id: location.id,
@@ -42,7 +46,7 @@ router.get(
   requirePermission('items.read'),
   asyncHandler(async (req, res) => {
     const { type, status } = req.query || {};
-    const filters = {};
+    const filters = buildTenantFilter(req);
     if (type) {
       filters.type = type;
     }
@@ -63,6 +67,7 @@ router.post(
       throw new HttpError(400, 'El nombre es obligatorio');
     }
     const location = await Location.create({
+      tenant: req.user?.tenantId || null,
       name: name.trim(),
       type: ensureValidType(type),
       description: sanitizeOptionalString(description),
@@ -78,7 +83,7 @@ router.put(
   requirePermission('items.write'),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const location = await Location.findById(id);
+    const location = await Location.findOne({ ...buildTenantFilter(req), _id: id });
     if (!location) {
       throw new HttpError(404, 'Ubicación no encontrada');
     }
@@ -114,7 +119,7 @@ router.delete(
   requirePermission('items.write'),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const location = await Location.findById(id);
+    const location = await Location.findOne({ ...buildTenantFilter(req), _id: id });
     if (!location) {
       throw new HttpError(404, 'Ubicación no encontrada');
     }

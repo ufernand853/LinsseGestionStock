@@ -107,11 +107,27 @@ un proceso escuchando en ese puerto (generalmente otra instancia previa del back
 Una vez liberado el puerto, vuelve a iniciar el servicio con `pm2 start` o `pm2 restart`.
 
 
+
+#### Preparación para publicación SaaS
+
+Antes de exponer la API públicamente, copiá `backend/.env.example` a `backend/.env` y ajustá al menos:
+
+- `NODE_ENV=production` para activar validaciones de configuración segura.
+- `JWT_SECRET` con un valor largo, aleatorio y privado.
+- `ADMIN_PASSWORD` con una contraseña inicial robusta; el backend no inicia en producción si queda la contraseña por defecto.
+- `CORS_ORIGINS` con el/los dominios reales del frontend, separados por comas.
+- `TRUST_PROXY=true` si el servicio queda detrás de Nginx, Traefik, un load balancer o una plataforma que termina HTTPS antes de llegar a Node.js.
+
+La API también expone `GET /health` sin autenticación para health checks de plataformas SaaS y balanceadores.
+
 #### Variables de entorno soportadas
 
 | Variable | Descripción | Valor por defecto |
 |----------|-------------|-------------------|
 | `PORT` | Puerto HTTP del backend | `3000` |
+| `NODE_ENV` | Entorno de ejecución. En `production` se bloquea el arranque si quedan secretos inseguros por defecto. | `development` |
+| `CORS_ORIGINS` | Lista separada por comas de orígenes permitidos para el frontend SaaS (por ejemplo `https://app.tudominio.com`). Si queda vacío, se mantiene el comportamiento abierto para desarrollo. | - |
+| `TRUST_PROXY` | Habilita `trust proxy` de Express cuando la API corre detrás de proxy o balanceador con TLS terminado externamente. | `false` |
 | `MONGO_URI` | Cadena de conexión a MongoDB. Si incluye usuario/contraseña asegurate de agregar los parámetros necesarios (p. ej. `authSource`). | `mongodb://localhost:27017/gestionthibe` |
 | `MONGO_DB_NAME` | Nombre de la base de datos a utilizar cuando se provee la URI sin sufijo o se necesita forzar otra base. | `gestionthibe` (si no se especifica en la URI) |
 | `MONGO_USER` | Usuario para autenticarse contra MongoDB (alternativa a incrustarlo en la URI). | - |
@@ -127,6 +143,16 @@ Una vez liberado el puerto, vuelve a iniciar el servicio con `pm2 start` o `pm2 
 | `ADMIN_PASSWORD` | Contraseña del usuario administrador semilla | `ChangeMe123!` |
 
 > 💡 **Tip:** si ves el error `MongoServerError: Authentication failed` asegurate de que las variables `MONGO_USER`, `MONGO_PASSWORD` y `MONGO_AUTH_SOURCE` coincidan con el usuario creado en tu instancia. Alternativamente podés incluirlas directamente en `MONGO_URI`, recordando sumar los parámetros como `authSource=admin` cuando corresponda.
+
+### Modelo inicial de licencias SaaS
+
+El backend crea tres planes base al iniciar:
+
+- **Básico**: USD 10/mes, hasta 100 productos.
+- **Pro**: USD 50/mes, hasta 500 productos.
+- **Empresa**: sin límite de productos, pensado para integraciones y varias sucursales.
+
+Cada usuario puede quedar asociado a una cuenta cliente (`Tenant`) y esa cuenta tiene un plan de suscripción. La respuesta de login/refresh incluye el bloque `license` con el nombre de la cuenta, estado de suscripción, plan, precio y límite de productos para que el frontend pueda mostrar la licencia activa. Al crear artículos, el backend valida el límite de productos del plan y devuelve un error si la cuenta ya alcanzó el máximo permitido.
 
 ### Credenciales iniciales
 
@@ -156,7 +182,7 @@ destinos y bitácoras de movimiento. El archivo está pensado para acelerar prue
 un catálogo ampliado de artículos para probar listados y filtros. El contenido está expresado en **Extended JSON**, por lo que
 conserva los `ObjectId` y referencias entre colecciones al importarlo desde herramientas como MongoDB Compass o `mongoimport`.
 
-El dataset crea automáticamente los depósitos base (Depósito General, Sobrestock General, Sobrestock Thibe, Sobrestock Arenal y Preparación de despachos) y asigna stock a cada artículo utilizando los identificadores reales de esos depósitos. Asimismo, incluye destinos comerciales de ejemplo y solicitudes de transferencia entre depósitos para ilustrar los distintos estados (pendiente, aprobado, ejecutado y rechazado).
+El dataset de ejemplo puede incluir ubicaciones demostrativas para pruebas, pero el arranque normal de la aplicación no crea depósitos fijos: cada cliente SaaS debe cargar sus ubicaciones desde el ABM correspondiente. El dataset también incluye solicitudes de transferencia entre depósitos para ilustrar los distintos estados (pendiente, aprobado, ejecutado y rechazado).
 
 El dataset define los grupos iniciales requeridos por la solución:
 
