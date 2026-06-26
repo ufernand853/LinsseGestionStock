@@ -12,7 +12,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
   const token = header.substring('Bearer '.length);
   try {
     const payload = jwt.verify(token, config.jwtSecret);
-    const user = await User.findById(payload.sub).populate('role');
+    const user = await User.findById(payload.sub).populate('role').populate({ path: 'tenant', populate: { path: 'plan' } });
     if (!user || user.status !== 'active') {
       return next();
     }
@@ -23,6 +23,22 @@ const authenticate = asyncHandler(async (req, res, next) => {
       role: user.role ? user.role.name : null,
       roleId: user.role ? user.role.id : null,
       permissions: user.role ? user.role.permissions : [],
+      tenantId: user.tenant ? user.tenant.id : null,
+      license: user.tenant
+        ? {
+            tenantId: user.tenant.id,
+            tenantName: user.tenant.name,
+            status: user.tenant.subscriptionStatus,
+            plan: user.tenant.plan
+              ? {
+                  code: user.tenant.plan.code,
+                  name: user.tenant.plan.name,
+                  priceUsdMonthly: user.tenant.plan.priceUsdMonthly,
+                  productLimit: user.tenant.plan.productLimit
+                }
+              : null
+          }
+        : null,
       lastLoginAt: user.lastLoginAt,
       preferences:
         user.preferences && typeof user.preferences.toObject === 'function'

@@ -5,7 +5,7 @@ Este documento consolida los ajustes implementados para el módulo de stock, tom
 ## Backend
 - **Filtros de auditoría y movimientos:** Las rutas `/logs/movements` y `/stock/requests` ahora aceptan filtros por acción/tipo y por rango de fechas (`from`/`to`), reutilizando el helper `parseDateBoundary` para normalizar los límites de día.
 - **Ejecución de transferencias:** Se mantiene la bitácora de cada acción (`requested`, `approved`, `executed`, `rejected`, `resubmitted`) con sus metadatos para permitir el seguimiento completo desde la auditoría.
-- **Ubicaciones semilla:** El seed incorpora los depósitos requeridos (Guadalupe, Justicia, Arnavia, Flex, Sobrestock Arenal Import y Sobrestock Thibe, entre otros) para que estén disponibles de inmediato al crear solicitudes.
+- **Ubicaciones semilla:** El seed ya no incorpora depósitos específicos de un cliente; cada cuenta debe configurar sus ubicaciones desde el ABM de ubicaciones.
 
 ## Frontend
 ### Branding y layout principal
@@ -21,7 +21,7 @@ Este documento consolida los ajustes implementados para el módulo de stock, tom
 - Estos indicadores aparecen ahora en los listados de Artículos, Solicitudes y Bandeja de Aprobaciones, mostrando también cuántas solicitudes pendientes afectan a cada artículo.
 
 ### Solicitudes de movimiento
-- El formulario prioriza los orígenes solicitados (Guadalupe, Justicia, Arnavia, Flex, Sobrestock Arenal Import y Sobrestock Thibe), incluye una leyenda de referencia y permite filtrar el historial por estado y por fechas.
+- El formulario ordena las ubicaciones configuradas alfabéticamente y permite filtrar el historial por estado y por fechas.
 - Se habilitó el reenvío de solicitudes rechazadas y se mantiene un resumen de disponibilidad del artículo al momento de consultar el historial.
 
 ### Auditoría

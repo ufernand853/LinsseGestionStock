@@ -13,7 +13,8 @@ const priceTierSchema = new Schema(
 
 const itemSchema = new Schema(
   {
-    code: { type: String, required: true, trim: true, unique: true },
+    tenant: { type: Types.ObjectId, ref: 'Tenant', default: null, index: true },
+    code: { type: String, required: true, trim: true },
     sku: { type: String, trim: true, unique: true, sparse: true, immutable: true },
     description: { type: String, required: true, trim: true },
     group: { type: Types.ObjectId, ref: 'Group', default: null },
@@ -61,5 +62,7 @@ itemSchema.pre('validate', function ensureStockQuantities(next) {
   }
   next();
 });
+
+itemSchema.index({ tenant: 1, code: 1 }, { unique: true });
 
 module.exports = model('Item', itemSchema);

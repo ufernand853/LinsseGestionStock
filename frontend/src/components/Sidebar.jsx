@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { formatLicensePlan, formatLicensePrice } from '../utils/license.js';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Resumen' },
@@ -21,6 +22,8 @@ export default function Sidebar() {
   const { user } = useAuth();
   const permissions = user?.permissions || [];
   const role = user?.role || null;
+  const licenseLabel = formatLicensePlan(user?.license);
+  const licensePrice = formatLicensePrice(user?.license);
 
   return (
     <aside className="sidebar">
@@ -43,7 +46,16 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <div className="sidebar-footer">v1.0.0</div>
+      <div className="sidebar-footer">
+        <span>v1.0.0</span>
+        {user?.license ? (
+          <div className="sidebar-license">
+            <strong>{user.license.tenantName}</strong>
+            <span>{licenseLabel}</span>
+            {licensePrice ? <span>{licensePrice}</span> : null}
+          </div>
+        ) : null}
+      </div>
     </aside>
   );
 }

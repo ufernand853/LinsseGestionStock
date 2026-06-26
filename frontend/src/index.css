@@ -107,6 +107,23 @@ button:hover:not(:disabled) {
   margin-top: auto;
   font-size: 0.85rem;
   color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.sidebar-license {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.sidebar-license strong {
+  color: #fff;
 }
 
 .main-content {
@@ -138,6 +155,21 @@ button:hover:not(:disabled) {
 .header-user span {
   font-size: 0.95rem;
   color: #475569;
+}
+
+.header-user-summary strong {
+  color: #0f172a;
+}
+
+.license-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  background: #eff6ff;
+  color: #1d4ed8 !important;
+  border: 1px solid #bfdbfe;
+  font-weight: 600;
 }
 
 .page-wrapper {

@@ -17,11 +17,33 @@ const reportsRoutes = require('./routes/reports');
 const rolesRoutes = require('./routes/roles');
 const preferencesRoutes = require('./routes/preferences');
 
+const config = require('./config');
+
 const app = express();
 
-app.use(cors());
+if (config.trustProxy) {
+  app.set('trust proxy', 1);
+}
+
+const corsOptions = config.corsOrigins.length > 0
+  ? {
+      origin(origin, callback) {
+        if (!origin || config.corsOrigins.includes(origin)) {
+          callback(null, true);
+          return;
+        }
+        callback(new HttpError(403, 'Origen no permitido por CORS'));
+      }
+    }
+  : undefined;
+
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '75mb' }));
 app.use(morgan('dev'));
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', environment: config.nodeEnv });
+});
+
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 app.use(authenticate);
 
