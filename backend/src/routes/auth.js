@@ -9,9 +9,12 @@ const User = require('../models/User');
 const RefreshToken = require('../models/RefreshToken');
 const { recordAuditEvent } = require('../services/auditService');
 
+const { serializeLicense } = require('../services/licenseSerializer');
+
 function serializeUser(userDoc) {
   const role = userDoc.role;
   const preferences = userDoc.preferences;
+  const tenant = userDoc.tenant;
   return {
     id: userDoc.id,
     username: userDoc.username,
@@ -19,6 +22,8 @@ function serializeUser(userDoc) {
     roleId: role ? role.id : userDoc.role,
     role: role ? role.name : null,
     permissions: role ? role.permissions : [],
+    tenantId: tenant ? tenant.id : null,
+    license: serializeLicense(tenant),
     status: userDoc.status,
     createdAt: userDoc.createdAt,
     updatedAt: userDoc.updatedAt,
@@ -36,7 +41,7 @@ router.post(
     if (!email || !password) {
       throw new HttpError(400, 'Debe indicar email y password');
     }
-    const user = await User.findOne({ email }).populate('role');
+    const user = await User.findOne({ email }).populate('role').populate({ path: 'tenant', populate: { path: 'plan' } });
     if (!user || user.status !== 'active') {
       throw new HttpError(401, 'Credenciales inválidas');
     }
@@ -92,7 +97,7 @@ router.post(
       await stored.deleteOne();
       throw new HttpError(401, 'Refresh token expirado');
     }
-    const user = await User.findById(stored.user).populate('role');
+    const user = await User.findById(stored.user).populate('role').populate({ path: 'tenant', populate: { path: 'plan' } });
     if (!user || user.status !== 'active') {
       await stored.deleteOne();
       throw new HttpError(401, 'Usuario no disponible');

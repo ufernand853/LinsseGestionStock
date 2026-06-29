@@ -16,11 +16,18 @@ import LocationsPage from './pages/locations/LocationsPage.jsx';
 import ReportsPage from './pages/reports/ReportsPage.jsx';
 import AuditLogsPage from './pages/audit/AuditLogsPage.jsx';
 import UsersPage from './pages/users/UsersPage.jsx';
+import PricingPage from './pages/public/PricingPage.jsx';
+import RegisterTenantPage from './pages/public/RegisterTenantPage.jsx';
+import PaymentResultPage from './pages/public/PaymentResultPage.jsx';
+import LicensePage from './pages/billing/LicensePage.jsx';
 
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/planes" element={<PricingPage />} />
+      <Route path="/registro" element={<RegisterTenantPage />} />
+      <Route path="/pago/:status" element={<PaymentResultPage />} />
       <Route
         path="/"
         element={
@@ -43,6 +50,7 @@ export default function App() {
         <Route path="reports" element={<ReportsPage />} />
         <Route path="audit" element={<AuditLogsPage />} />
         <Route path="users" element={<UsersPage />} />
+        <Route path="licencia" element={<LicensePage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
