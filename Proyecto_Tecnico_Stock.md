@@ -7,7 +7,7 @@ Diseñar un sistema que permita administrar inventario en una red de depósitos,
 
 ## 2. Alcance Funcional
 - **Grupos de artículos** con jerarquía (grupo padre → subgrupo) y atributos configurables (género, talle, color, material, temporada, etc.).
-- **Depósitos** configurables (alta/baja/estado). Casos base: Depósito General, Sobrestock General, Sobrestock Thibe, Sobrestock Arenal, Preparación de despachos.
+- **Depósitos** configurables por cliente/tenant (alta/baja/estado), sin ubicaciones fijas predefinidas.
 - **Destinos** (clientes, franquicias, marketplaces) con datos de contacto.
 - **Movimientos de stock** únicamente entre depósitos (origen y destino distintos) con flujo de aprobación.
 - **Reportes** de stock por grupo y por depósito con exportación CSV.
@@ -121,9 +121,9 @@ Diseñar un sistema que permita administrar inventario en una red de depósitos,
 ---
 
 ## 5. Casos de Uso
-1. **Reabastecimiento**: mover stock desde Sobrestock General a Depósito General tras revisar reportes.
+1. **Reabastecimiento**: mover stock entre depósitos configurados tras revisar reportes.
 2. **Preparación de envío**: transferir mercadería al depósito "Preparación de despachos" para consolidar pedidos de destinos.
-3. **Campaña especial**: mover productos consignados (Thibe/Arenal) hacia Depósito General según demanda.
+3. **Campaña especial**: mover productos consignados o de terceros entre ubicaciones configuradas según demanda.
 4. **Auditoría**: consultar logs para identificar quién aprobó y ejecutó un movimiento en fecha determinada.
 
 ---

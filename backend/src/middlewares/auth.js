@@ -3,6 +3,7 @@ const config = require('../config');
 const asyncHandler = require('../utils/asyncHandler');
 const { HttpError } = require('../utils/errors');
 const User = require('../models/User');
+const { serializeLicense } = require('../services/licenseSerializer');
 
 const authenticate = asyncHandler(async (req, res, next) => {
   const header = req.headers.authorization;
@@ -12,7 +13,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
   const token = header.substring('Bearer '.length);
   try {
     const payload = jwt.verify(token, config.jwtSecret);
-    const user = await User.findById(payload.sub).populate('role');
+    const user = await User.findById(payload.sub).populate('role').populate({ path: 'tenant', populate: { path: 'plan' } });
     if (!user || user.status !== 'active') {
       return next();
     }
@@ -23,6 +24,8 @@ const authenticate = asyncHandler(async (req, res, next) => {
       role: user.role ? user.role.name : null,
       roleId: user.role ? user.role.id : null,
       permissions: user.role ? user.role.permissions : [],
+      tenantId: user.tenant ? user.tenant.id : null,
+      license: serializeLicense(user.tenant),
       lastLoginAt: user.lastLoginAt,
       preferences:
         user.preferences && typeof user.preferences.toObject === 'function'
