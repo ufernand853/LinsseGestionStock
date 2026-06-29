@@ -22,7 +22,7 @@ Desarrollar un sistema de gestión de inventario enfocado en depósitos configur
   - **Temporada**.
   - Otros campos libres según la categoría.
 - **Ubicaciones**:
-  - Depósitos internos (General, Sobrestock General, Sobrestock Thibe, Sobrestock Arenal, Preparación de despachos).
+  - Depósitos internos configurables por cada cliente/tenant.
   - Destinos externos configurables con información de contacto.
   - Alta/Baja/Edición de ubicaciones adicionales según la operación.
 - **Operaciones**:
@@ -163,14 +163,14 @@ Desarrollar un sistema de gestión de inventario enfocado en depósitos configur
 ## 5. Casos de Uso Clave
 
 1. **Transferencia interna**
-   - Operador genera solicitud Depósito General → Sobrestock General.
+   - Operador genera solicitud entre depósitos configurados por el cliente.
    - Admin aprueba y ejecuta; el stock se descuenta/abona en cada depósito.
 2. **Preparación de despacho**
-   - Operador mueve mercadería desde Depósito General a Preparación de despachos.
+   - Operador mueve mercadería desde un depósito interno hacia un área de preparación configurada.
    - Cuando se confirma el envío físico se crea la documentación externa (fuera del sistema) vinculada al destino.
 3. **Reabastecimiento por campaña**
    - Reporte por grupo identifica faltantes.
-   - Operador mueve stock desde Sobrestock Thibe hacia Depósito General para reponer tiendas.
+   - Operador mueve stock desde una ubicación de reserva hacia el depósito principal configurado.
 4. **Auditoría**
    - Usuario de consulta revisa logs filtrados por depósito, artículo o fecha para validar quién autorizó cada transferencia.
 
