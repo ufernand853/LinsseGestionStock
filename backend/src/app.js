@@ -53,6 +53,8 @@ app.use('/api/webhooks', webhooksRoutes);
 
 app.use(authenticate);
 
+app.use('/api/public', publicRoutes);
+app.use('/api/webhooks', webhooksRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/groups', groupsRoutes);
