@@ -16,6 +16,11 @@ const logsRoutes = require('./routes/logs');
 const reportsRoutes = require('./routes/reports');
 const rolesRoutes = require('./routes/roles');
 const preferencesRoutes = require('./routes/preferences');
+const publicRoutes = require('./routes/public');
+const billingRoutes = require('./routes/billing');
+const webhooksRoutes = require('./routes/webhooks');
+
+const config = require('./config');
 
 const config = require('./config');
 
@@ -47,6 +52,8 @@ app.get('/health', (req, res) => {
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 app.use(authenticate);
 
+app.use('/api/public', publicRoutes);
+app.use('/api/webhooks', webhooksRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/groups', groupsRoutes);
@@ -57,6 +64,7 @@ app.use('/api/logs', logsRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/roles', rolesRoutes);
 app.use('/api/preferences', preferencesRoutes);
+app.use('/api/billing', billingRoutes);
 
 app.use((req, res, next) => {
   next(new HttpError(404, 'Ruta no encontrada'));

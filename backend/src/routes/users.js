@@ -6,6 +6,10 @@ const { requirePermission } = require('../middlewares/auth');
 const User = require('../models/User');
 const Role = require('../models/Role');
 
+function buildTenantFilter(req) {
+  return req.user?.tenantId ? { tenant: req.user.tenantId } : { tenant: null };
+}
+
 function serializeUser(userDoc) {
   const role = userDoc.role;
   const preferences = userDoc.preferences;
@@ -30,7 +34,7 @@ router.get(
   '/',
   requirePermission('users.read'),
   asyncHandler(async (req, res) => {
-    const users = await User.find().populate('role');
+    const users = await User.find(buildTenantFilter(req)).populate('role');
     res.json(users.map(serializeUser));
   })
 );
@@ -44,7 +48,8 @@ router.post(
       throw new HttpError(400, 'username, email, password y roleId son obligatorios');
     }
     const existing = await User.findOne({
-      $or: [{ email: email.toLowerCase() }, { username }]
+      $or: [{ email: email.toLowerCase() }, { username }],
+      ...buildTenantFilter(req)
     });
     if (existing) {
       throw new HttpError(400, 'El usuario ya existe');
@@ -59,7 +64,8 @@ router.post(
       email,
       passwordHash,
       role: role.id,
-      status: status || 'active'
+      status: status || 'active',
+      tenant: req.user?.tenantId || null
     });
     const created = await user.populate('role');
     res.status(201).json(serializeUser(created));
@@ -71,7 +77,7 @@ router.put(
   requirePermission('users.write'),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findOne({ _id: id, ...buildTenantFilter(req) });
     if (!user) {
       throw new HttpError(404, 'Usuario no encontrado');
     }
@@ -120,7 +126,7 @@ router.delete(
       throw new HttpError(403, 'Solo un administrador puede eliminar usuarios');
     }
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findOne({ _id: id, ...buildTenantFilter(req) });
     if (!user) {
       throw new HttpError(404, 'Usuario no encontrado');
     }
@@ -137,7 +143,7 @@ router.delete(
   requirePermission('users.write'),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findOne({ _id: id, ...buildTenantFilter(req) });
     if (!user) {
       throw new HttpError(404, 'Usuario no encontrado');
     }

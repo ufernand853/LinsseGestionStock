@@ -15,7 +15,8 @@ const NAV_ITEMS = [
   { to: '/locations', label: 'Ubicaciones', permission: 'items.read', hiddenForRoles: ['Operador'] },
   { to: '/reports', label: 'Reportes', permission: 'reports.read', hiddenForRoles: ['Operador'] },
   { to: '/audit', label: 'Auditoría', permission: 'stock.logs.read', hiddenForRoles: ['Operador'] },
-  { to: '/users', label: 'Usuarios', permission: 'users.read', hiddenForRoles: ['Operador'] }
+  { to: '/users', label: 'Usuarios', permission: 'users.read', hiddenForRoles: ['Operador'] },
+  { to: '/licencia', label: 'Mi licencia' }
 ];
 
 export default function Sidebar() {

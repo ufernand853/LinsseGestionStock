@@ -3,6 +3,7 @@ const config = require('../config');
 const asyncHandler = require('../utils/asyncHandler');
 const { HttpError } = require('../utils/errors');
 const User = require('../models/User');
+const { serializeLicense } = require('../services/licenseSerializer');
 
 const authenticate = asyncHandler(async (req, res, next) => {
   const header = req.headers.authorization;
@@ -24,21 +25,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
       roleId: user.role ? user.role.id : null,
       permissions: user.role ? user.role.permissions : [],
       tenantId: user.tenant ? user.tenant.id : null,
-      license: user.tenant
-        ? {
-            tenantId: user.tenant.id,
-            tenantName: user.tenant.name,
-            status: user.tenant.subscriptionStatus,
-            plan: user.tenant.plan
-              ? {
-                  code: user.tenant.plan.code,
-                  name: user.tenant.plan.name,
-                  priceUsdMonthly: user.tenant.plan.priceUsdMonthly,
-                  productLimit: user.tenant.plan.productLimit
-                }
-              : null
-          }
-        : null,
+      license: serializeLicense(user.tenant),
       lastLoginAt: user.lastLoginAt,
       preferences:
         user.preferences && typeof user.preferences.toObject === 'function'

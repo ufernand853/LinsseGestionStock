@@ -37,9 +37,9 @@ const defaultRoles = [
 ];
 
 const defaultPlans = [
-  { code: 'BASIC', name: 'Básico', priceUsdMonthly: 10, productLimit: 100, description: 'Para pequeños comercios', ctaLabel: 'Contratar' },
-  { code: 'PRO', name: 'Pro', priceUsdMonthly: 50, productLimit: 500, description: 'Hasta 500 productos', ctaLabel: 'Contratar' },
-  { code: 'ENTERPRISE', name: 'Empresa', priceUsdMonthly: null, productLimit: null, description: 'Sin límites, integraciones y varias sucursales', ctaLabel: 'Solicitar demo' }
+  { code: 'BASIC', name: 'Básico', priceUsdMonthly: 10, priceAmount: 390, currency: 'UYU', productLimit: 100, description: 'Para pequeños comercios', ctaLabel: 'Contratar' },
+  { code: 'PRO', name: 'Pro', priceUsdMonthly: 50, priceAmount: 1990, currency: 'UYU', productLimit: 500, description: 'Hasta 500 productos', ctaLabel: 'Contratar' },
+  { code: 'ENTERPRISE', name: 'Empresa', priceUsdMonthly: null, priceAmount: null, currency: 'UYU', productLimit: null, description: 'Sin límites, integraciones y varias sucursales', ctaLabel: 'Solicitar demo' }
 ];
 
 const defaultGroups = [

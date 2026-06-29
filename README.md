@@ -304,3 +304,36 @@ La pantalla de etiquetas imprime cada EAN-13 en una página física de 100 × 10
 Sin `--kiosk-printing`, los navegadores muestran obligatoriamente su diálogo de impresión. La aplicación genera el trabajo en un marco oculto y no abre una pestaña o ventana adicional.
 
 > Nota: la impresión de etiquetas se mantiene con el flujo del navegador y la impresora configurada; no incluye un flujo Bluetooth propio dentro de la aplicación.
+
+## SaaS con Mercado Pago Uruguay
+
+La aplicación incluye un flujo inicial de contratación SaaS:
+
+- `GET /api/public/plans`: lista los planes activos.
+- `POST /api/public/register`: crea tenant, usuario administrador y, para planes pagos, genera una suscripción en Mercado Pago.
+- `POST /api/webhooks/mercadopago`: recibe notificaciones de Mercado Pago y actualiza la suscripción/licencia.
+- `GET /api/billing/license`: devuelve la licencia y uso de productos del tenant autenticado.
+
+Los planes se muestran en pesos uruguayos (`UYU`) para Mercado Pago Uruguay. Las variables necesarias son:
+
+```env
+PUBLIC_APP_URL=https://app.example.com
+MERCADOPAGO_ACCESS_TOKEN=
+MERCADOPAGO_PUBLIC_KEY=
+MERCADOPAGO_COUNTRY=UY
+MERCADOPAGO_CURRENCY=UYU
+MERCADOPAGO_SUCCESS_URL=https://app.example.com/pago/exitoso
+MERCADOPAGO_PENDING_URL=https://app.example.com/pago/pendiente
+MERCADOPAGO_FAILURE_URL=https://app.example.com/pago/error
+MERCADOPAGO_NOTIFICATION_URL=https://app.example.com/api/webhooks/mercadopago
+```
+
+Rutas públicas del frontend:
+
+- `/planes`: muestra Básico, Pro y Empresa.
+- `/registro?plan=BASIC`: alta de empresa y administrador.
+- `/pago/exitoso`, `/pago/pendiente`, `/pago/error`: resultados de Mercado Pago.
+
+Ruta interna:
+
+- `/licencia`: muestra plan, estado, suscripción y productos usados.

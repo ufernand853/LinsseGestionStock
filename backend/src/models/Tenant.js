@@ -11,7 +11,8 @@ const tenantSchema = new Schema(
       default: 'trialing'
     },
     trialEndsAt: { type: Date, default: null },
-    currentPeriodEndsAt: { type: Date, default: null }
+    currentPeriodEndsAt: { type: Date, default: null },
+    mercadoPagoSubscriptionId: { type: String, default: null, trim: true, index: true }
   },
   { timestamps: true, versionKey: false }
 );

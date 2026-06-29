@@ -55,7 +55,19 @@ const config = {
   accessTokenTtl: parseInt(process.env.ACCESS_TOKEN_TTL || '3600', 10),
   refreshTokenTtl: parseInt(process.env.REFRESH_TOKEN_TTL || '604800', 10),
   adminEmail: process.env.ADMIN_EMAIL || 'admin@example.com',
-  adminPassword: process.env.ADMIN_PASSWORD || 'ChangeMe123!'
+  adminPassword: process.env.ADMIN_PASSWORD || 'ChangeMe123!',
+  publicAppUrl: process.env.PUBLIC_APP_URL || '',
+  mercadoPago: {
+    accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || '',
+    publicKey: process.env.MERCADOPAGO_PUBLIC_KEY || '',
+    webhookSecret: process.env.MERCADOPAGO_WEBHOOK_SECRET || '',
+    currency: process.env.MERCADOPAGO_CURRENCY || 'UYU',
+    country: process.env.MERCADOPAGO_COUNTRY || 'UY',
+    successUrl: process.env.MERCADOPAGO_SUCCESS_URL || '',
+    pendingUrl: process.env.MERCADOPAGO_PENDING_URL || '',
+    failureUrl: process.env.MERCADOPAGO_FAILURE_URL || '',
+    notificationUrl: process.env.MERCADOPAGO_NOTIFICATION_URL || ''
+  }
 };
 
 module.exports = config;

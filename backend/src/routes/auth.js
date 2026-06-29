@@ -9,29 +9,7 @@ const User = require('../models/User');
 const RefreshToken = require('../models/RefreshToken');
 const { recordAuditEvent } = require('../services/auditService');
 
-function serializeLicense(tenant) {
-  if (!tenant) {
-    return null;
-  }
-  const plan = tenant.plan;
-  return {
-    tenantId: tenant.id,
-    tenantName: tenant.name,
-    status: tenant.subscriptionStatus,
-    trialEndsAt: tenant.trialEndsAt,
-    currentPeriodEndsAt: tenant.currentPeriodEndsAt,
-    plan: plan
-      ? {
-          code: plan.code,
-          name: plan.name,
-          priceUsdMonthly: plan.priceUsdMonthly,
-          productLimit: plan.productLimit,
-          description: plan.description,
-          ctaLabel: plan.ctaLabel
-        }
-      : null
-  };
-}
+const { serializeLicense } = require('../services/licenseSerializer');
 
 function serializeUser(userDoc) {
   const role = userDoc.role;
