@@ -22,6 +22,8 @@ const webhooksRoutes = require('./routes/webhooks');
 
 const config = require('./config');
 
+const config = require('./config');
+
 const app = express();
 
 if (config.trustProxy) {
