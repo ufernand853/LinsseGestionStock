@@ -32,6 +32,64 @@ async function listPublicPlans() {
   return plans.map(serializePlan);
 }
 
+async function createMercadoPagoSubscription({ tenant, plan, payerEmail }) {
+  const mpSubscription = await mercadoPagoService.createSubscription({ tenant, plan, payerEmail });
+  const subscription = await Subscription.create({
+    tenant: tenant.id,
+    plan: plan.id,
+    providerSubscriptionId: mpSubscription.id || null,
+    initPoint: mpSubscription.init_point || mpSubscription.sandbox_init_point || null,
+    status: mapMercadoPagoStatus(mpSubscription.status).subscription,
+    payerEmail,
+    amount: plan.priceAmount,
+    currency: plan.currency,
+    rawProviderData: mpSubscription
+  });
+  tenant.mercadoPagoSubscriptionId = subscription.providerSubscriptionId;
+  tenant.subscriptionStatus = mapMercadoPagoStatus(mpSubscription.status).tenant;
+  await tenant.save();
+  return subscription;
+}
+
+async function retryExistingRegistration({ existingUser, companyName, password, plan, payerEmail }) {
+  const validPassword = await bcrypt.compare(password, existingUser.passwordHash);
+  if (!validPassword) {
+    throw new HttpError(400, 'Ya existe un usuario con ese email. Indicá la contraseña correcta para reintentar el pago.');
+  }
+  const tenant = await Tenant.findById(existingUser.tenant);
+  if (!tenant) {
+    throw new HttpError(400, 'El usuario ya existe pero no tiene una cuenta SaaS asociada.');
+  }
+  if (tenant.subscriptionStatus === 'active') {
+    throw new HttpError(400, 'Ya existe una cuenta activa con ese email.');
+  }
+
+  tenant.name = companyName || tenant.name;
+  tenant.billingEmail = payerEmail;
+  tenant.plan = plan.id;
+
+  let subscription = await Subscription.findOne({
+    tenant: tenant.id,
+    plan: plan.id,
+    status: { $in: ['pending', 'rejected', 'past_due'] },
+    initPoint: { $ne: null }
+  }).sort({ createdAt: -1 });
+
+  if (!subscription && plan.priceAmount) {
+    subscription = await createMercadoPagoSubscription({ tenant, plan, payerEmail });
+  } else {
+    await tenant.save();
+  }
+
+  return {
+    tenant,
+    user: existingUser,
+    plan,
+    subscription,
+    checkoutUrl: subscription?.initPoint || null
+  };
+}
+
 async function registerTenant({ companyName, billingEmail, username, password, planCode }) {
   if (!companyName || !billingEmail || !username || !password || !planCode) {
     throw new HttpError(400, 'Empresa, email, usuario, contraseña y plan son obligatorios');
@@ -44,7 +102,7 @@ async function registerTenant({ companyName, billingEmail, username, password, p
   }
   const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser) {
-    throw new HttpError(400, 'Ya existe un usuario con ese email');
+    return retryExistingRegistration({ existingUser, companyName, password, plan, payerEmail: normalizedEmail });
   }
   const adminRole = await Role.findOne({ name: 'Administrador' });
   if (!adminRole) {
@@ -69,21 +127,7 @@ async function registerTenant({ companyName, billingEmail, username, password, p
   let checkoutUrl = null;
   let subscription = null;
   if (plan.priceAmount) {
-    const mpSubscription = await mercadoPagoService.createSubscription({ tenant, plan, payerEmail: normalizedEmail });
-    subscription = await Subscription.create({
-      tenant: tenant.id,
-      plan: plan.id,
-      providerSubscriptionId: mpSubscription.id || null,
-      initPoint: mpSubscription.init_point || mpSubscription.sandbox_init_point || null,
-      status: mapMercadoPagoStatus(mpSubscription.status).subscription,
-      payerEmail: normalizedEmail,
-      amount: plan.priceAmount,
-      currency: plan.currency,
-      rawProviderData: mpSubscription
-    });
-    tenant.mercadoPagoSubscriptionId = subscription.providerSubscriptionId;
-    tenant.subscriptionStatus = mapMercadoPagoStatus(mpSubscription.status).tenant;
-    await tenant.save();
+    subscription = await createMercadoPagoSubscription({ tenant, plan, payerEmail: normalizedEmail });
     checkoutUrl = subscription.initPoint;
   }
 
