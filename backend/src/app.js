@@ -22,8 +22,6 @@ const webhooksRoutes = require('./routes/webhooks');
 
 const config = require('./config');
 
-const config = require('./config');
-
 const app = express();
 
 if (config.trustProxy) {
@@ -50,6 +48,9 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+app.use('/api/public', publicRoutes);
+app.use('/api/webhooks', webhooksRoutes);
+
 app.use(authenticate);
 
 app.use('/api/public', publicRoutes);
