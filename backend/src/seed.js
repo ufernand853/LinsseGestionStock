@@ -4,6 +4,9 @@ const User = require('./models/User');
 const Group = require('./models/Group');
 const config = require('./config');
 const Location = require('./models/Location');
+const Item = require('./models/Item');
+const SubscriptionPlan = require('./models/SubscriptionPlan');
+const Tenant = require('./models/Tenant');
 
 const defaultRoles = [
   {
@@ -33,6 +36,12 @@ const defaultRoles = [
   }
 ];
 
+const defaultPlans = [
+  { code: 'BASIC', name: 'Básico', priceUsdMonthly: 10, priceAmount: 390, currency: 'UYU', productLimit: 100, description: 'Para pequeños comercios', ctaLabel: 'Contratar' },
+  { code: 'PRO', name: 'Pro', priceUsdMonthly: 50, priceAmount: 1990, currency: 'UYU', productLimit: 500, description: 'Hasta 500 productos', ctaLabel: 'Contratar' },
+  { code: 'ENTERPRISE', name: 'Empresa', priceUsdMonthly: null, priceAmount: null, currency: 'UYU', productLimit: null, description: 'Sin límites, integraciones y varias sucursales', ctaLabel: 'Solicitar demo' }
+];
+
 const defaultGroups = [
   'MEDIAS',
   'ROPA INTERIOR',
@@ -55,6 +64,26 @@ const defaultGroups = [
   'CLIENTES'
 ];
 
+async function seedPlans() {
+  for (const plan of defaultPlans) {
+    await SubscriptionPlan.updateOne({ code: plan.code }, { $set: plan }, { upsert: true });
+  }
+}
+
+async function ensureDefaultTenant() {
+  const enterprisePlan = await SubscriptionPlan.findOne({ code: 'ENTERPRISE' });
+  let tenant = await Tenant.findOne({ billingEmail: config.adminEmail });
+  if (!tenant) {
+    tenant = await Tenant.create({
+      name: 'Cuenta principal',
+      billingEmail: config.adminEmail,
+      plan: enterprisePlan.id,
+      subscriptionStatus: 'active'
+    });
+  }
+  return tenant;
+}
+
 async function seedRoles() {
   for (const role of defaultRoles) {
     const existing = await Role.findOne({ name: role.name });
@@ -75,7 +104,7 @@ async function seedGroups() {
   }
 }
 
-async function seedAdminUser() {
+async function seedAdminUser(defaultTenant) {
   const adminEmail = config.adminEmail;
   let admin = await User.findOne({ email: adminEmail }).populate('role');
   if (!admin) {
@@ -86,24 +115,24 @@ async function seedAdminUser() {
       email: adminEmail,
       passwordHash,
       role: adminRole.id,
+      tenant: defaultTenant.id,
       status: 'active'
     });
     console.log(`Usuario administrador creado con email ${adminEmail}`);
+  } else if (!admin.tenant) {
+    admin.tenant = defaultTenant.id;
+    await admin.save();
   }
 }
 
-const defaultLocations = [
-  { name: 'Depósito General', type: 'warehouse' },
-  { name: 'Sobrestock General', type: 'warehouse' },
-  { name: 'Sobrestock Thibe', type: 'warehouse' },
-  { name: 'Sobrestock Arenal', type: 'warehouse' },
-  { name: 'Sobrestock Arenal Import', type: 'warehouse' },
-  { name: 'Guadalupe', type: 'warehouse' },
-  { name: 'Justicia', type: 'warehouse' },
-  { name: 'Arnavia', type: 'warehouse' },
-  { name: 'Flex', type: 'warehouse' },
-  { name: 'Destino Comercial', type: 'external' }
-];
+const defaultLocations = [];
+
+async function attachLegacyItemsToDefaultTenant(defaultTenant) {
+  await Item.updateMany(
+    { $or: [{ tenant: { $exists: false } }, { tenant: null }] },
+    { $set: { tenant: defaultTenant.id } }
+  );
+}
 
 async function seedLocations() {
   const hasAnyLocation = await Location.exists({});
@@ -111,14 +140,19 @@ async function seedLocations() {
     return;
   }
 
-  await Location.insertMany(defaultLocations);
+  if (defaultLocations.length > 0) {
+    await Location.insertMany(defaultLocations);
+  }
 }
 
 async function seed() {
+  await seedPlans();
+  const defaultTenant = await ensureDefaultTenant();
   await seedRoles();
   await seedGroups();
   await seedLocations();
-  await seedAdminUser();
+  await seedAdminUser(defaultTenant);
+  await attachLegacyItemsToDefaultTenant(defaultTenant);
 }
 
 module.exports = seed;

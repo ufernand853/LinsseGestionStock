@@ -25,6 +25,21 @@ const uploadsRoot = path.join(projectRoot, 'uploads');
 const itemUploadsDir = path.join(uploadsRoot, 'items');
 fs.mkdirSync(itemUploadsDir, { recursive: true });
 
+function buildTenantFilter(req) {
+  return req.user?.tenantId ? { tenant: req.user.tenantId } : { tenant: null };
+}
+
+async function assertProductLimit(req) {
+  const limit = req.user?.license?.plan?.productLimit;
+  if (!Number.isFinite(limit)) {
+    return;
+  }
+  const currentProducts = await Item.countDocuments({ ...buildTenantFilter(req), deletedAt: null });
+  if (currentProducts >= limit) {
+    throw new HttpError(402, `El plan ${req.user.license.plan.name} permite hasta ${limit} productos. Actualizá la licencia para cargar más artículos.`);
+  }
+}
+
 const ALLOWED_DATA_URL_PREFIXES = [
   { match: 'data:image/jpeg;base64,', normalized: 'data:image/jpeg;base64,', mimeType: 'image/jpeg', extension: 'jpg' },
   { match: 'data:image/jpg;base64,', normalized: 'data:image/jpeg;base64,', mimeType: 'image/jpeg', extension: 'jpg' },
@@ -532,7 +547,7 @@ router.get(
     const { page = '1', pageSize = '20', groupId, search, sku, gender, size, color } = req.query || {};
     const pageNumber = Math.max(parseInt(page, 10) || 1, 1);
     const limit = Math.min(Math.max(parseInt(pageSize, 10) || 20, 1), 200);
-    const filter = { deletedAt: null };
+    const filter = { ...buildTenantFilter(req), deletedAt: null };
     const normalizedGroupId = typeof groupId === 'string' ? groupId.trim() : '';
     if (normalizedGroupId) {
       const groupIds = await collectGroupAndDescendantIds(normalizedGroupId);
@@ -578,7 +593,7 @@ router.get(
   '/trash',
   requirePermission('items.write'),
   asyncHandler(async (req, res) => {
-    const items = await Item.find({ deletedAt: { $ne: null } }).populate('group').sort({ deletedAt: -1 });
+    const items = await Item.find({ ...buildTenantFilter(req), deletedAt: { $ne: null } }).populate('group').sort({ deletedAt: -1 });
     res.json({ items: items.map(serializeItem), retentionDays: TRASH_RETENTION_DAYS });
   })
 );
@@ -602,6 +617,7 @@ router.get(
     }
     const selectedGroupIds = requestedGroupId ? [requestedGroupId] : overstockGroupIds;
     const filter = {
+      ...buildTenantFilter(req),
       deletedAt: null,
       group: { $in: buildGroupFilterValues(selectedGroupIds) }
     };
@@ -650,7 +666,7 @@ router.post(
   '/recount/mark-all',
   requirePermission('items.write'),
   asyncHandler(async (req, res) => {
-    const filter = { deletedAt: null };
+    const filter = { ...buildTenantFilter(req), deletedAt: null };
     const [total, alreadyPending] = await Promise.all([
       Item.countDocuments(filter),
       Item.countDocuments({ ...filter, needsRecount: true })
@@ -673,7 +689,7 @@ router.patch(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     if (!Types.ObjectId.isValid(id)) throw new HttpError(400, 'Artículo inválido');
-    const item = await Item.findOne({ _id: id, deletedAt: null });
+    const item = await Item.findOne({ ...buildTenantFilter(req), _id: id, deletedAt: null });
     if (!item) throw new HttpError(404, 'Artículo no encontrado');
     const before = await buildItemAuditSnapshot(item);
     if (Object.prototype.hasOwnProperty.call(req.body || {}, 'stock')) {
@@ -705,7 +721,7 @@ router.post(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     if (!Types.ObjectId.isValid(id)) throw new HttpError(400, 'Artículo inválido');
-    const item = await Item.findOne({ _id: id, deletedAt: { $ne: null } });
+    const item = await Item.findOne({ ...buildTenantFilter(req), _id: id, deletedAt: { $ne: null } });
     if (!item) throw new HttpError(404, 'Artículo no encontrado en la papelera');
     item.deletedAt = null;
     item.deletedBy = null;
@@ -728,7 +744,7 @@ router.delete(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     if (!Types.ObjectId.isValid(id)) throw new HttpError(400, 'Artículo inválido');
-    const item = await Item.findOne({ _id: id, deletedAt: { $ne: null } });
+    const item = await Item.findOne({ ...buildTenantFilter(req), _id: id, deletedAt: { $ne: null } });
     if (!item) throw new HttpError(404, 'Artículo no encontrado en la papelera');
     await permanentlyDeleteItem(item, { user: req.user?.username || 'Desconocido' });
     res.status(204).send();
@@ -756,7 +772,9 @@ router.post(
     if (!code || !description) {
       throw new HttpError(400, 'code y description son obligatorios');
     }
-    const existing = await Item.findOne({ code });
+    await assertProductLimit(req);
+    const tenantFilter = buildTenantFilter(req);
+    const existing = await Item.findOne({ ...tenantFilter, code });
     if (existing) {
       throw new HttpError(400, 'El código ya existe');
     }
@@ -790,6 +808,7 @@ router.post(
     let item;
     try {
       let itemData = {
+        tenant: req.user?.tenantId || null,
         code,
         description,
         group: group ? group.id : null,
@@ -836,7 +855,7 @@ router.put(
     if (!Types.ObjectId.isValid(id)) {
       throw new HttpError(400, 'Artículo inválido');
     }
-    const item = await Item.findOne({ _id: id, deletedAt: null });
+    const item = await Item.findOne({ ...buildTenantFilter(req), _id: id, deletedAt: null });
     if (!item) {
       throw new HttpError(404, 'Artículo no encontrado');
     }
@@ -1041,7 +1060,7 @@ router.delete(
     if (!Types.ObjectId.isValid(id)) {
       throw new HttpError(400, 'Artículo inválido');
     }
-    const item = await Item.findOne({ _id: id, deletedAt: null });
+    const item = await Item.findOne({ ...buildTenantFilter(req), _id: id, deletedAt: null });
     if (!item) {
       throw new HttpError(404, 'Artículo no encontrado');
     }

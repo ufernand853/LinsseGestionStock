@@ -12,17 +12,6 @@ const SCAN_MODE_OPTIONS = [
   { value: 'units', label: 'Unidades' }
 ];
 
-const ORIGIN_PRIORITY = [
-  'Guadalupe',
-  'Justicia',
-  'Arnavia',
-  'Flex',
-  'Sobrestock Arenal Import',
-  'Sobrestock Thibe',
-  'Sobrestock General',
-  'Sobrestock Thibe Kids'
-];
-
 function normalizeLocation(location) {
   const rawId = location?.id || location?._id;
   return {
@@ -65,15 +54,7 @@ function normalizeItem(item) {
   };
 }
 
-function compareLocationsByRequestPriority(a, b) {
-  const priorityMap = new Map(ORIGIN_PRIORITY.map((name, index) => [name.toLowerCase(), index]));
-  const aName = (a.name || '').toLowerCase();
-  const bName = (b.name || '').toLowerCase();
-  const aPriority = priorityMap.has(aName) ? priorityMap.get(aName) : Number.MAX_SAFE_INTEGER;
-  const bPriority = priorityMap.has(bName) ? priorityMap.get(bName) : Number.MAX_SAFE_INTEGER;
-  if (aPriority !== bPriority) {
-    return aPriority - bPriority;
-  }
+function compareLocationsByName(a, b) {
   return (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' });
 }
 
@@ -141,7 +122,7 @@ export default function BarcodeReceptionPage() {
     () => activeLocations
       .filter(location => (hasRequesterRestrictions ? location.type === 'warehouse' : ['warehouse', 'externalOrigin'].includes(location.type)))
       .slice()
-      .sort(compareLocationsByRequestPriority),
+      .sort(compareLocationsByName),
     [activeLocations, hasRequesterRestrictions]
   );
   const requestDestinations = useMemo(
@@ -185,7 +166,7 @@ export default function BarcodeReceptionPage() {
         const activeNormalized = normalized.filter(location => location.status !== 'inactive');
         const firstOrigin = activeNormalized
           .filter(location => (hasRequesterRestrictions ? location.type === 'warehouse' : ['warehouse', 'externalOrigin'].includes(location.type)))
-          .sort(compareLocationsByRequestPriority)[0];
+          .sort(compareLocationsByName)[0];
         const firstDestination = activeNormalized.find(location => ['warehouse', 'external'].includes(location.type));
         setOriginLocationId(firstOrigin?.id || '');
         setDestinationLocationId(firstDestination?.id || '');
