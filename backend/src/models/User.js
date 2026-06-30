@@ -20,6 +20,7 @@ const userSchema = new Schema(
     email: { type: String, required: true, trim: true, lowercase: true, unique: true },
     passwordHash: { type: String, required: true },
     role: { type: Types.ObjectId, ref: 'Role', required: true },
+    tenant: { type: Types.ObjectId, ref: 'Tenant', default: null, index: true },
     status: { type: String, enum: ['active', 'disabled'], default: 'active' },
     lastLoginAt: { type: Date, default: null },
     preferences: { type: preferencesSchema, default: () => ({}) }

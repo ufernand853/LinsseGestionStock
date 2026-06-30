@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function LoginPage() {
@@ -62,6 +62,9 @@ export default function LoginPage() {
             {loading ? 'Ingresando...' : 'Ingresar'}
           </button>
         </form>
+        <p style={{ marginTop: '1rem', color: '#64748b' }}>
+          ¿No tenés cuenta? <Link to="/planes" style={{ color: '#2563eb', fontWeight: 700 }}>Ver planes</Link>
+        </p>
       </div>
     </div>
   );
