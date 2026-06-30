@@ -66,7 +66,8 @@ const config = {
     successUrl: process.env.MERCADOPAGO_SUCCESS_URL || '',
     pendingUrl: process.env.MERCADOPAGO_PENDING_URL || '',
     failureUrl: process.env.MERCADOPAGO_FAILURE_URL || '',
-    notificationUrl: process.env.MERCADOPAGO_NOTIFICATION_URL || ''
+    notificationUrl: process.env.MERCADOPAGO_NOTIFICATION_URL || '',
+    payerEmailOverride: process.env.MERCADOPAGO_PAYER_EMAIL_OVERRIDE || ''
   }
 };
 

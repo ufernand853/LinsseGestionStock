@@ -41,11 +41,12 @@ async function createSubscription({ tenant, plan, payerEmail }) {
   if (!amount || amount <= 0) {
     throw new HttpError(400, 'El plan seleccionado no tiene precio mensual automático.');
   }
+  const mercadoPagoPayerEmail = config.mercadoPago.payerEmailOverride || payerEmail;
 
   const body = {
     reason: `${plan.name} - ${tenant.name}`,
     external_reference: String(tenant.id),
-    payer_email: payerEmail,
+    payer_email: mercadoPagoPayerEmail,
     auto_recurring: {
       frequency: 1,
       frequency_type: plan.billingPeriod || 'months',
