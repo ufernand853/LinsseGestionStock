@@ -305,6 +305,38 @@ Sin `--kiosk-printing`, los navegadores muestran obligatoriamente su diálogo de
 
 > Nota: la impresión de etiquetas se mantiene con el flujo del navegador y la impresora configurada; no incluye un flujo Bluetooth propio dentro de la aplicación.
 
+
+### Publicación con Nginx en `stock.linsse.com`
+
+El dominio público debe existir como `server_name stock.linsse.com` en Nginx y debe usar un certificado emitido para ese mismo host. No alcanza con cambiar el `.env`: si Nginx sigue usando un bloque como `server_name rubenrossiseguros.linsse.com` y certificados de `/etc/letsencrypt/live/rubenrossiseguros.linsse.com/`, `curl` y los navegadores rechazarán `https://stock.linsse.com` por certificado no coincidente.
+
+El archivo `ops/nginx/stock.linsse.com.conf` contiene un ejemplo equivalente al sitio `seguros`, pero adaptado al dominio `stock.linsse.com`, al frontend compilado en `frontend/dist` y al backend local `127.0.0.1:3010`.
+
+Si todavía no existe `/etc/letsencrypt/live/stock.linsse.com/fullchain.pem`, primero habilitá la configuración temporal HTTP-only para que `nginx -t` no falle por certificados inexistentes:
+
+```bash
+sudo cp ops/nginx/stock.linsse.com.bootstrap.conf /etc/nginx/sites-available/stock.linsse.com
+sudo ln -sfn /etc/nginx/sites-available/stock.linsse.com /etc/nginx/sites-enabled/stock.linsse.com
+sudo nginx -t
+sudo systemctl reload nginx
+sudo certbot certonly --webroot -w /var/www/html -d stock.linsse.com
+```
+
+Después de emitir el certificado, reemplazá la configuración temporal por la configuración HTTPS definitiva y recargá Nginx:
+
+```bash
+sudo cp ops/nginx/stock.linsse.com.conf /etc/nginx/sites-available/stock.linsse.com
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Verificá que Nginx muestre `server_name stock.linsse.com` y certificados bajo `/etc/letsencrypt/live/stock.linsse.com/`:
+
+```bash
+sudo nginx -T 2>/dev/null | grep -n "server_name\|ssl_certificate" | grep -A3 -B3 "stock.linsse.com"
+curl -i https://stock.linsse.com/health
+```
+
 ## SaaS con Mercado Pago Uruguay
 
 La aplicación incluye un flujo inicial de contratación SaaS:
@@ -317,16 +349,38 @@ La aplicación incluye un flujo inicial de contratación SaaS:
 Los planes se muestran en pesos uruguayos (`UYU`) para Mercado Pago Uruguay. Las variables necesarias son:
 
 ```env
-PUBLIC_APP_URL=https://app.example.com
+PUBLIC_APP_URL=https://stock.linsse.com
 MERCADOPAGO_ACCESS_TOKEN=
 MERCADOPAGO_PUBLIC_KEY=
 MERCADOPAGO_COUNTRY=UY
 MERCADOPAGO_CURRENCY=UYU
-MERCADOPAGO_SUCCESS_URL=https://app.example.com/pago/exitoso
-MERCADOPAGO_PENDING_URL=https://app.example.com/pago/pendiente
-MERCADOPAGO_FAILURE_URL=https://app.example.com/pago/error
-MERCADOPAGO_NOTIFICATION_URL=https://app.example.com/api/webhooks/mercadopago
+MERCADOPAGO_SUCCESS_URL=https://stock.linsse.com/pago/exitoso
+MERCADOPAGO_PENDING_URL=https://stock.linsse.com/pago/pendiente
+MERCADOPAGO_FAILURE_URL=https://stock.linsse.com/pago/error
+MERCADOPAGO_NOTIFICATION_URL=https://stock.linsse.com/api/webhooks/mercadopago
 ```
+
+Para probar con credenciales `TEST-`, copiá las credenciales de prueba desde la cuenta productiva/principal de
+Mercado Pago que administra la aplicación. Mercado Pago no permite generar credenciales de prueba desde una cuenta
+de prueba. Usá esas credenciales en `MERCADOPAGO_ACCESS_TOKEN` y `MERCADOPAGO_PUBLIC_KEY`.
+
+Para ejecutar el checkout de prueba, usá una cuenta **compradora de prueba** del mismo país (`UY`). No pagues el
+checkout de prueba con una cuenta real ni con la misma cuenta que administra la aplicación. Mercado Pago rechaza pagos
+que mezclan usuarios reales y usuarios de prueba.
+
+Si querés registrar la cuenta SaaS con un email real pero pagar con el comprador de prueba, configurá:
+
+   ```env
+   MERCADOPAGO_PAYER_EMAIL_OVERRIDE=email-del-comprador-test@example.com
+   ```
+
+Reiniciá el backend después de cambiar credenciales o variables de Mercado Pago:
+
+   ```bash
+   pm2 restart LinsseGestionStock --update-env
+   ```
+
+Generá una suscripción nueva; los links de checkout creados antes del cambio mantienen la configuración anterior.
 
 Rutas públicas del frontend:
 
