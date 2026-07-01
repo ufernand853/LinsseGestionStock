@@ -305,6 +305,29 @@ Sin `--kiosk-printing`, los navegadores muestran obligatoriamente su diálogo de
 
 > Nota: la impresión de etiquetas se mantiene con el flujo del navegador y la impresora configurada; no incluye un flujo Bluetooth propio dentro de la aplicación.
 
+
+### Publicación con Nginx en `stock.linsse.com`
+
+El dominio público debe existir como `server_name stock.linsse.com` en Nginx y debe usar un certificado emitido para ese mismo host. No alcanza con cambiar el `.env`: si Nginx sigue usando un bloque como `server_name rubenrossiseguros.linsse.com` y certificados de `/etc/letsencrypt/live/rubenrossiseguros.linsse.com/`, `curl` y los navegadores rechazarán `https://stock.linsse.com` por certificado no coincidente.
+
+El archivo `ops/nginx/stock.linsse.com.conf` contiene un ejemplo equivalente al sitio `seguros`, pero adaptado al dominio `stock.linsse.com`, al frontend compilado en `frontend/dist` y al backend local `127.0.0.1:3010`. Un despliegue típico es:
+
+```bash
+sudo cp ops/nginx/stock.linsse.com.conf /etc/nginx/sites-available/stock.linsse.com
+sudo ln -sfn /etc/nginx/sites-available/stock.linsse.com /etc/nginx/sites-enabled/stock.linsse.com
+sudo nginx -t
+sudo certbot --nginx -d stock.linsse.com
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Después de emitir el certificado, verificá que Nginx muestre `server_name stock.linsse.com` y certificados bajo `/etc/letsencrypt/live/stock.linsse.com/`:
+
+```bash
+sudo nginx -T 2>/dev/null | grep -n "server_name\|ssl_certificate" | grep -A3 -B3 "stock.linsse.com"
+curl -i https://stock.linsse.com/health
+```
+
 ## SaaS con Mercado Pago Uruguay
 
 La aplicación incluye un flujo inicial de contratación SaaS:
