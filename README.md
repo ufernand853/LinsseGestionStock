@@ -310,18 +310,27 @@ Sin `--kiosk-printing`, los navegadores muestran obligatoriamente su diálogo de
 
 El dominio público debe existir como `server_name stock.linsse.com` en Nginx y debe usar un certificado emitido para ese mismo host. No alcanza con cambiar el `.env`: si Nginx sigue usando un bloque como `server_name rubenrossiseguros.linsse.com` y certificados de `/etc/letsencrypt/live/rubenrossiseguros.linsse.com/`, `curl` y los navegadores rechazarán `https://stock.linsse.com` por certificado no coincidente.
 
-El archivo `ops/nginx/stock.linsse.com.conf` contiene un ejemplo equivalente al sitio `seguros`, pero adaptado al dominio `stock.linsse.com`, al frontend compilado en `frontend/dist` y al backend local `127.0.0.1:3010`. Un despliegue típico es:
+El archivo `ops/nginx/stock.linsse.com.conf` contiene un ejemplo equivalente al sitio `seguros`, pero adaptado al dominio `stock.linsse.com`, al frontend compilado en `frontend/dist` y al backend local `127.0.0.1:3010`.
+
+Si todavía no existe `/etc/letsencrypt/live/stock.linsse.com/fullchain.pem`, primero habilitá la configuración temporal HTTP-only para que `nginx -t` no falle por certificados inexistentes:
+
+```bash
+sudo cp ops/nginx/stock.linsse.com.bootstrap.conf /etc/nginx/sites-available/stock.linsse.com
+sudo ln -sfn /etc/nginx/sites-available/stock.linsse.com /etc/nginx/sites-enabled/stock.linsse.com
+sudo nginx -t
+sudo systemctl reload nginx
+sudo certbot certonly --webroot -w /var/www/html -d stock.linsse.com
+```
+
+Después de emitir el certificado, reemplazá la configuración temporal por la configuración HTTPS definitiva y recargá Nginx:
 
 ```bash
 sudo cp ops/nginx/stock.linsse.com.conf /etc/nginx/sites-available/stock.linsse.com
-sudo ln -sfn /etc/nginx/sites-available/stock.linsse.com /etc/nginx/sites-enabled/stock.linsse.com
-sudo nginx -t
-sudo certbot --nginx -d stock.linsse.com
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-Después de emitir el certificado, verificá que Nginx muestre `server_name stock.linsse.com` y certificados bajo `/etc/letsencrypt/live/stock.linsse.com/`:
+Verificá que Nginx muestre `server_name stock.linsse.com` y certificados bajo `/etc/letsencrypt/live/stock.linsse.com/`:
 
 ```bash
 sudo nginx -T 2>/dev/null | grep -n "server_name\|ssl_certificate" | grep -A3 -B3 "stock.linsse.com"
