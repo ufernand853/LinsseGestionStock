@@ -38,7 +38,7 @@ async function createMercadoPagoSubscription({ tenant, plan, payerEmail }) {
     tenant: tenant.id,
     plan: plan.id,
     providerSubscriptionId: mpSubscription.id || null,
-    initPoint: mpSubscription.init_point || mpSubscription.sandbox_init_point || null,
+    initPoint: mercadoPagoService.getSubscriptionCheckoutUrl(mpSubscription),
     status: mapMercadoPagoStatus(mpSubscription.status).subscription,
     payerEmail,
     amount: plan.priceAmount,
@@ -78,6 +78,13 @@ async function retryExistingRegistration({ existingUser, companyName, password, 
   if (!subscription && plan.priceAmount) {
     subscription = await createMercadoPagoSubscription({ tenant, plan, payerEmail });
   } else {
+    if (subscription?.rawProviderData) {
+      const checkoutUrl = mercadoPagoService.getSubscriptionCheckoutUrl(subscription.rawProviderData);
+      if (checkoutUrl && checkoutUrl !== subscription.initPoint) {
+        subscription.initPoint = checkoutUrl;
+        await subscription.save();
+      }
+    }
     await tenant.save();
   }
 
