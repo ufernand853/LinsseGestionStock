@@ -69,4 +69,15 @@ async function getSubscription(preapprovalId) {
   return mercadoPagoRequest(`/preapproval/${encodeURIComponent(preapprovalId)}`);
 }
 
-module.exports = { createSubscription, getSubscription };
+function getSubscriptionCheckoutUrl(subscription) {
+  if (!subscription) {
+    return null;
+  }
+  const isTestCredential = config.mercadoPago.accessToken.startsWith('TEST-');
+  if (isTestCredential) {
+    return subscription.sandbox_init_point || subscription.init_point || null;
+  }
+  return subscription.init_point || subscription.sandbox_init_point || null;
+}
+
+module.exports = { createSubscription, getSubscription, getSubscriptionCheckoutUrl };

@@ -38,7 +38,7 @@ async function createMercadoPagoSubscription({ tenant, plan, payerEmail }) {
     tenant: tenant.id,
     plan: plan.id,
     providerSubscriptionId: mpSubscription.id || null,
-    initPoint: mpSubscription.init_point || mpSubscription.sandbox_init_point || null,
+    initPoint: mercadoPagoService.getSubscriptionCheckoutUrl(mpSubscription),
     status: mapMercadoPagoStatus(mpSubscription.status).subscription,
     payerEmail,
     amount: plan.priceAmount,
