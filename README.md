@@ -317,37 +317,38 @@ La aplicación incluye un flujo inicial de contratación SaaS:
 Los planes se muestran en pesos uruguayos (`UYU`) para Mercado Pago Uruguay. Las variables necesarias son:
 
 ```env
-PUBLIC_APP_URL=https://app.example.com
+PUBLIC_APP_URL=https://stock.linsse.com
 MERCADOPAGO_ACCESS_TOKEN=
 MERCADOPAGO_PUBLIC_KEY=
 MERCADOPAGO_COUNTRY=UY
 MERCADOPAGO_CURRENCY=UYU
-MERCADOPAGO_SUCCESS_URL=https://app.example.com/pago/exitoso
-MERCADOPAGO_PENDING_URL=https://app.example.com/pago/pendiente
-MERCADOPAGO_FAILURE_URL=https://app.example.com/pago/error
-MERCADOPAGO_NOTIFICATION_URL=https://app.example.com/api/webhooks/mercadopago
+MERCADOPAGO_SUCCESS_URL=https://stock.linsse.com/pago/exitoso
+MERCADOPAGO_PENDING_URL=https://stock.linsse.com/pago/pendiente
+MERCADOPAGO_FAILURE_URL=https://stock.linsse.com/pago/error
+MERCADOPAGO_NOTIFICATION_URL=https://stock.linsse.com/api/webhooks/mercadopago
 ```
 
-Para probar con credenciales `TEST-`, usá cuentas de prueba de Mercado Pago:
+Para probar con credenciales `TEST-`, copiá las credenciales de prueba desde la cuenta productiva/principal de
+Mercado Pago que administra la aplicación. Mercado Pago no permite generar credenciales de prueba desde una cuenta
+de prueba. Usá esas credenciales en `MERCADOPAGO_ACCESS_TOKEN` y `MERCADOPAGO_PUBLIC_KEY`.
 
-1. Creá una cuenta de prueba **vendedora** y una cuenta de prueba **compradora** del mismo país (`UY`).
-2. Generá o copiá las credenciales de la aplicación desde la cuenta **vendedora de prueba** y usalas en
-   `MERCADOPAGO_ACCESS_TOKEN` y `MERCADOPAGO_PUBLIC_KEY`.
-3. No pagues el checkout de prueba con una cuenta real ni con la misma cuenta vendedora. Mercado Pago rechaza
-   pagos que mezclan usuarios reales y usuarios de prueba.
-4. Si querés registrar la cuenta SaaS con un email real pero pagar con el comprador de prueba, configurá:
+Para ejecutar el checkout de prueba, usá una cuenta **compradora de prueba** del mismo país (`UY`). No pagues el
+checkout de prueba con una cuenta real ni con la misma cuenta que administra la aplicación. Mercado Pago rechaza pagos
+que mezclan usuarios reales y usuarios de prueba.
+
+Si querés registrar la cuenta SaaS con un email real pero pagar con el comprador de prueba, configurá:
 
    ```env
    MERCADOPAGO_PAYER_EMAIL_OVERRIDE=email-del-comprador-test@example.com
    ```
 
-5. Reiniciá el backend después de cambiar credenciales o variables de Mercado Pago:
+Reiniciá el backend después de cambiar credenciales o variables de Mercado Pago:
 
    ```bash
    pm2 restart LinsseGestionStock --update-env
    ```
 
-6. Generá una suscripción nueva; los links de checkout creados antes del cambio mantienen la configuración anterior.
+Generá una suscripción nueva; los links de checkout creados antes del cambio mantienen la configuración anterior.
 
 Rutas públicas del frontend:
 
