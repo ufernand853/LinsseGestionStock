@@ -11,6 +11,22 @@ function normalizePath(path) {
   return path;
 }
 
+function buildApiUrl(path) {
+  const normalizedPath = normalizePath(path);
+  const normalizedBase = String(API_BASE_URL || '').replace(/\/$/, '');
+  const absoluteBasePattern = /^[a-zA-Z][a-zA-Z\d+\-.]*:/;
+
+  if (absoluteBasePattern.test(normalizedBase)) {
+    return new URL(`${normalizedBase}${normalizedPath}`);
+  }
+
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return new URL(`${normalizedBase}${normalizedPath}`, window.location.origin);
+  }
+
+  return new URL(`http://localhost${normalizedBase}${normalizedPath}`);
+}
+
 function parseStoredValue() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -65,7 +81,7 @@ export function AuthProvider({ children }) {
       return null;
     }
     if (!refreshPromiseRef.current) {
-      refreshPromiseRef.current = fetch(`${API_BASE_URL}/auth/refresh`, {
+      refreshPromiseRef.current = fetch(buildApiUrl('/auth/refresh'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ refreshToken })
@@ -122,7 +138,7 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(
     async (email, password) => {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(buildApiUrl('/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ email, password })
@@ -148,7 +164,7 @@ export function AuthProvider({ children }) {
     const { refreshToken } = stateRef.current;
     try {
       if (refreshToken) {
-        await fetch(`${API_BASE_URL}/auth/logout`, {
+        await fetch(buildApiUrl('/auth/logout'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refreshToken })
@@ -163,7 +179,7 @@ export function AuthProvider({ children }) {
 
   const authFetch = useCallback(
     async (path, { method = 'GET', body, query, headers = {}, skipAuth = false } = {}) => {
-      const url = new URL(`${API_BASE_URL}${normalizePath(path)}`);
+      const url = buildApiUrl(path);
       if (query) {
         Object.entries(query)
           .filter(([, value]) => value !== undefined && value !== null && value !== '')
