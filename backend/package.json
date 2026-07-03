@@ -8,6 +8,8 @@
     "dev": "nodemon src/index.js",
     "test": "node -e \"console.log('No hay pruebas automatizadas definidas')\"",
     "seed:sample": "node scripts/import-sample-dataset.js",
+    "seed:demo": "node scripts/generate-demo-dataset.js",
+    "seed:demo:import": "node scripts/import-sample-dataset.js --file docs/demo-dataset.json",
     "sku:sync": "node scripts/sync-item-skus.js",
     "sku:status": "node scripts/sku-status.js",
     "sku:reindex": "node scripts/reindex-item-skus.js"
