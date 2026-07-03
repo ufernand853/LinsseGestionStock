@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-03T18:18:14.955Z",
+  "generatedAt": "2026-07-03T18:38:25.820Z",
   "metadata": {
     "description": "Dataset demo generado automáticamente para presentaciones comerciales.",
     "notes": "Usuario demo: admin@linsse.com / Agosto2020. Rol: Administrador."
@@ -190,13 +190,13 @@
       },
       "username": "admin",
       "email": "admin@linsse.com",
-      "passwordHash": "$2a$12$IWQNkR8iYhO9hR9Bhc71xOdx6YTG0dEcX.LzwbBw0qCMdPMCIVgRe",
+      "passwordHash": "$2a$12$v1u9I4Ba7esVdSAWWFhzE.3.nsvYkBkiNaXeGsNe1mx3qeiKztwei",
       "role": {
         "$oid": "ef32330603acbaccb322ea2c"
       },
       "status": "active",
-      "createdAt": "2026-07-03T18:18:14.955Z",
-      "lastLoginAt": "2026-07-03T18:18:14.955Z"
+      "createdAt": "2026-07-03T18:38:25.820Z",
+      "lastLoginAt": "2026-07-03T18:38:25.820Z"
     }
   ],
   "items": [
@@ -230,7 +230,7 @@
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAwMBASqSeEIAAAAASUVORK5CYII="
       ],
       "createdAt": "2024-03-15T10:00:00Z",
-      "updatedAt": "2026-07-03T18:18:14.955Z"
+      "updatedAt": "2026-07-03T18:38:25.820Z"
     },
     {
       "_id": {
@@ -266,7 +266,7 @@
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAukB9VEWilQAAAAASUVORK5CYII="
       ],
       "createdAt": "2024-03-16T10:00:00Z",
-      "updatedAt": "2026-07-03T18:18:14.955Z"
+      "updatedAt": "2026-07-03T18:38:25.820Z"
     },
     {
       "_id": {
@@ -301,7 +301,7 @@
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAukB9VEWilQAAAAASUVORK5CYII="
       ],
       "createdAt": "2024-03-17T10:00:00Z",
-      "updatedAt": "2026-07-03T18:18:14.955Z"
+      "updatedAt": "2026-07-03T18:38:25.820Z"
     },
     {
       "_id": {
@@ -1131,7 +1131,7 @@
         "boxes": 18,
         "units": 0
       },
-      "reason": "Reserva para apertura Boutique Central",
+      "reason": "Reserva para apertura de nueva sucursal",
       "requestedBy": {
         "$oid": "64656d6f2d757365722d6164"
       },
@@ -1328,7 +1328,7 @@
       "metadata": {
         "ip": "192.168.10.12",
         "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-        "notes": "Reserva para apertura Boutique Central"
+        "notes": "Reserva para apertura de nueva sucursal"
       }
     },
     {
@@ -1529,8 +1529,8 @@
       "_id": {
         "$oid": "64b3e2d5a6f0c8b1a1a1a1a1"
       },
-      "name": "Depósito General",
-      "description": "Stock disponible para despacho principal",
+      "name": "Depósito principal",
+      "description": "Stock disponible para la operación principal",
       "status": "active",
       "createdAt": "2024-03-01T10:00:00.000Z",
       "updatedAt": "2024-05-20T15:00:00.000Z",
@@ -1541,8 +1541,8 @@
       "_id": {
         "$oid": "64b3e2d5a6f0c8b1a1a1a1a2"
       },
-      "name": "Sobrestock General",
-      "description": "Excedentes almacenados en depósito secundario",
+      "name": "Depósito secundario",
+      "description": "Stock de apoyo para distribución interna",
       "status": "active",
       "createdAt": "2024-03-01T10:00:00.000Z",
       "updatedAt": "2024-05-20T15:00:00.000Z",
@@ -1553,8 +1553,8 @@
       "_id": {
         "$oid": "64b3e2d5a6f0c8b1a1a1a1a3"
       },
-      "name": "Sobrestock Thibe",
-      "description": "Mercadería consignada por Thibe",
+      "name": "Depósito auxiliar 1",
+      "description": "Ubicación auxiliar para almacenamiento",
       "status": "active",
       "createdAt": "2024-03-01T10:00:00.000Z",
       "updatedAt": "2024-05-20T15:00:00.000Z",
@@ -1565,8 +1565,8 @@
       "_id": {
         "$oid": "64b3e2d5a6f0c8b1a1a1a1a4"
       },
-      "name": "Sobrestock Arenal",
-      "description": "Mercadería consignada por Arenal Import",
+      "name": "Depósito auxiliar 2",
+      "description": "Ubicación auxiliar para soporte operativo",
       "status": "active",
       "createdAt": "2024-03-01T10:00:00.000Z",
       "updatedAt": "2024-05-20T15:00:00.000Z",
@@ -1577,8 +1577,8 @@
       "_id": {
         "$oid": "64b3e2d5a6f0c8b1a1a1a1a5"
       },
-      "name": "Preparación de despachos",
-      "description": "Mercadería separada para envíos a destinos",
+      "name": "Área de preparación",
+      "description": "Mercadería separada para preparación y despacho",
       "status": "active",
       "createdAt": "2024-03-01T10:00:00.000Z",
       "updatedAt": "2024-05-20T15:00:00.000Z",
@@ -1589,8 +1589,8 @@
       "_id": {
         "$oid": "b9a7d24a650795fb89b8fc67"
       },
-      "name": "Boutique Central",
-      "contactInfo": "Lucía Nóbile - lnobile@boutiquecentral.com - +54 11 4444-8899",
+      "name": "Sucursal Centro",
+      "contactInfo": "Contacto comercial - centro@example.com - +54 11 4000-0001",
       "createdAt": "2024-02-01T11:00:00.000Z",
       "updatedAt": "2024-05-15T16:30:00.000Z",
       "status": "active",
@@ -1601,8 +1601,8 @@
       "_id": {
         "$oid": "3c20796c8ef9e72714855520"
       },
-      "name": "Tiendas Atlántico",
-      "contactInfo": "Rodrigo Méndez - rmendez@atlanticotiendas.com - +54 223 555-7711",
+      "name": "Sucursal Norte",
+      "contactInfo": "Contacto comercial - norte@example.com - +54 11 4000-0002",
       "createdAt": "2024-02-12T09:45:00.000Z",
       "updatedAt": "2024-05-18T12:15:00.000Z",
       "status": "active",
@@ -1613,8 +1613,8 @@
       "_id": {
         "$oid": "e3cd4d22c2a6180fd3280643"
       },
-      "name": "Mercado del Sur",
-      "contactInfo": "Paula Figueroa - pfigueroa@mercadelsur.com - +54 261 455-3200",
+      "name": "Canal mayorista",
+      "contactInfo": "Contacto comercial - mayorista@example.com - +54 11 4000-0003",
       "createdAt": "2024-03-04T14:05:00.000Z",
       "updatedAt": "2024-05-19T18:10:00.000Z",
       "status": "active",
@@ -1625,8 +1625,8 @@
       "_id": {
         "$oid": "31afe13cf0c248dcb63eebaa"
       },
-      "name": "Distribuidora Patagónica",
-      "contactInfo": "María Paredes - mp@distribuidorapata.com - +54 9 299 455-8899",
+      "name": "Cliente corporativo",
+      "contactInfo": "Contacto comercial - corporativo@example.com - +54 11 4000-0004",
       "createdAt": "2024-02-10T14:20:00.000Z",
       "updatedAt": "2024-05-05T19:05:00.000Z",
       "status": "active",

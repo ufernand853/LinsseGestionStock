@@ -14,17 +14,6 @@ import {
   locationTypeSuffix
 } from '../../utils/movements.js';
 
-const ORIGIN_PRIORITY = [
-  'Guadalupe',
-  'Justicia',
-  'Arnavia',
-  'Flex',
-  'Sobrestock Arenal Import',
-  'Sobrestock Thibe',
-  'Sobrestock General',
-  'Sobrestock Thibe Kids'
-];
-
 const MOVEMENT_TYPE_OPTIONS = [
   { value: '', label: 'Todos' },
   { value: 'transfer', label: 'Transferencias' },
@@ -177,9 +166,6 @@ export default function MovementRequestsPage() {
   }, [itemFilter, items]);
 
   const originOptions = useMemo(() => {
-    const priorityMap = new Map(
-      ORIGIN_PRIORITY.map((name, index) => [name.toLowerCase(), index])
-    );
     const availableLocations = Array.isArray(locations) ? locations : [];
     const allowedOriginTypes = hasRequesterRestrictions
       ? ['warehouse']
@@ -187,16 +173,7 @@ export default function MovementRequestsPage() {
     return availableLocations
       .filter(location => allowedOriginTypes.includes(location.type))
       .slice()
-      .sort((a, b) => {
-        const aName = (a.name || '').toLowerCase();
-        const bName = (b.name || '').toLowerCase();
-        const aPriority = priorityMap.has(aName) ? priorityMap.get(aName) : Number.MAX_SAFE_INTEGER;
-        const bPriority = priorityMap.has(bName) ? priorityMap.get(bName) : Number.MAX_SAFE_INTEGER;
-        if (aPriority !== bPriority) {
-          return aPriority - bPriority;
-        }
-        return (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' });
-      });
+      .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' }));
   }, [hasRequesterRestrictions, locations]);
 
   const pendingMap = useMemo(() => aggregatePendingByItem(pendingSnapshot), [pendingSnapshot]);

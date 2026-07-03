@@ -12,17 +12,6 @@ const SCAN_MODE_OPTIONS = [
   { value: 'units', label: 'Unidades' }
 ];
 
-const ORIGIN_PRIORITY = [
-  'Guadalupe',
-  'Justicia',
-  'Arnavia',
-  'Flex',
-  'Sobrestock Arenal Import',
-  'Sobrestock Thibe',
-  'Sobrestock General',
-  'Sobrestock Thibe Kids'
-];
-
 function normalizeLocation(location) {
   const rawId = location?.id || location?._id;
   return {
@@ -66,14 +55,6 @@ function normalizeItem(item) {
 }
 
 function compareLocationsByRequestPriority(a, b) {
-  const priorityMap = new Map(ORIGIN_PRIORITY.map((name, index) => [name.toLowerCase(), index]));
-  const aName = (a.name || '').toLowerCase();
-  const bName = (b.name || '').toLowerCase();
-  const aPriority = priorityMap.has(aName) ? priorityMap.get(aName) : Number.MAX_SAFE_INTEGER;
-  const bPriority = priorityMap.has(bName) ? priorityMap.get(bName) : Number.MAX_SAFE_INTEGER;
-  if (aPriority !== bPriority) {
-    return aPriority - bPriority;
-  }
   return (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' });
 }
 

@@ -1115,7 +1115,7 @@
                 "boxes": 18,
                 "units": 0
             },
-            "reason": "Reserva para apertura Boutique Central",
+            "reason": "Reserva para apertura de nueva sucursal",
             "requestedBy": {
                 "$oid": "f61afdbec55ee16412b6374d"
             },
@@ -1312,7 +1312,7 @@
             "metadata": {
                 "ip": "192.168.10.12",
                 "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-                "notes": "Reserva para apertura Boutique Central"
+                "notes": "Reserva para apertura de nueva sucursal"
             }
         },
         {
@@ -1513,8 +1513,8 @@
             "_id": {
                 "$oid": "64b3e2d5a6f0c8b1a1a1a1a1"
             },
-            "name": "Dep\u00f3sito General",
-            "description": "Stock disponible para despacho principal",
+            "name": "Dep\u00f3sito principal",
+            "description": "Stock disponible para la operaci\u00f3n principal",
             "status": "active",
             "createdAt": "2024-03-01T10:00:00.000Z",
             "updatedAt": "2024-05-20T15:00:00.000Z",
@@ -1525,8 +1525,8 @@
             "_id": {
                 "$oid": "64b3e2d5a6f0c8b1a1a1a1a2"
             },
-            "name": "Sobrestock General",
-            "description": "Excedentes almacenados en dep\u00f3sito secundario",
+            "name": "Dep\u00f3sito secundario",
+            "description": "Stock de apoyo para distribuci\u00f3n interna",
             "status": "active",
             "createdAt": "2024-03-01T10:00:00.000Z",
             "updatedAt": "2024-05-20T15:00:00.000Z",
@@ -1537,8 +1537,8 @@
             "_id": {
                 "$oid": "64b3e2d5a6f0c8b1a1a1a1a3"
             },
-            "name": "Sobrestock Thibe",
-            "description": "Mercader\u00eda consignada por Thibe",
+            "name": "Dep\u00f3sito auxiliar 1",
+            "description": "Ubicaci\u00f3n auxiliar para almacenamiento",
             "status": "active",
             "createdAt": "2024-03-01T10:00:00.000Z",
             "updatedAt": "2024-05-20T15:00:00.000Z",
@@ -1549,8 +1549,8 @@
             "_id": {
                 "$oid": "64b3e2d5a6f0c8b1a1a1a1a4"
             },
-            "name": "Sobrestock Arenal",
-            "description": "Mercader\u00eda consignada por Arenal Import",
+            "name": "Dep\u00f3sito auxiliar 2",
+            "description": "Ubicaci\u00f3n auxiliar para soporte operativo",
             "status": "active",
             "createdAt": "2024-03-01T10:00:00.000Z",
             "updatedAt": "2024-05-20T15:00:00.000Z",
@@ -1561,8 +1561,8 @@
             "_id": {
                 "$oid": "64b3e2d5a6f0c8b1a1a1a1a5"
             },
-            "name": "Preparaci\u00f3n de despachos",
-            "description": "Mercader\u00eda separada para env\u00edos a destinos",
+            "name": "\u00c1rea de preparaci\u00f3n",
+            "description": "Mercader\u00eda separada para preparaci\u00f3n y despacho",
             "status": "active",
             "createdAt": "2024-03-01T10:00:00.000Z",
             "updatedAt": "2024-05-20T15:00:00.000Z",
@@ -1573,8 +1573,8 @@
             "_id": {
                 "$oid": "b9a7d24a650795fb89b8fc67"
             },
-            "name": "Boutique Central",
-            "contactInfo": "Luc\u00eda N\u00f3bile - lnobile@boutiquecentral.com - +54 11 4444-8899",
+            "name": "Sucursal Centro",
+            "contactInfo": "Contacto comercial - centro@example.com - +54 11 4000-0001",
             "createdAt": "2024-02-01T11:00:00.000Z",
             "updatedAt": "2024-05-15T16:30:00.000Z",
             "status": "active",
@@ -1585,8 +1585,8 @@
             "_id": {
                 "$oid": "3c20796c8ef9e72714855520"
             },
-            "name": "Tiendas Atl\u00e1ntico",
-            "contactInfo": "Rodrigo M\u00e9ndez - rmendez@atlanticotiendas.com - +54 223 555-7711",
+            "name": "Sucursal Norte",
+            "contactInfo": "Contacto comercial - norte@example.com - +54 11 4000-0002",
             "createdAt": "2024-02-12T09:45:00.000Z",
             "updatedAt": "2024-05-18T12:15:00.000Z",
             "status": "active",
@@ -1597,8 +1597,8 @@
             "_id": {
                 "$oid": "e3cd4d22c2a6180fd3280643"
             },
-            "name": "Mercado del Sur",
-            "contactInfo": "Paula Figueroa - pfigueroa@mercadelsur.com - +54 261 455-3200",
+            "name": "Canal mayorista",
+            "contactInfo": "Contacto comercial - mayorista@example.com - +54 11 4000-0003",
             "createdAt": "2024-03-04T14:05:00.000Z",
             "updatedAt": "2024-05-19T18:10:00.000Z",
             "status": "active",
@@ -1609,8 +1609,8 @@
             "_id": {
                 "$oid": "31afe13cf0c248dcb63eebaa"
             },
-            "name": "Distribuidora Patag\u00f3nica",
-            "contactInfo": "Mar\u00eda Paredes - mp@distribuidorapata.com - +54 9 299 455-8899",
+            "name": "Cliente corporativo",
+            "contactInfo": "Contacto comercial - corporativo@example.com - +54 11 4000-0004",
             "createdAt": "2024-02-10T14:20:00.000Z",
             "updatedAt": "2024-05-05T19:05:00.000Z",
             "status": "active",

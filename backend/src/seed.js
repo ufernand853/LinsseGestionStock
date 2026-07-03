@@ -93,16 +93,10 @@ async function seedAdminUser() {
 }
 
 const defaultLocations = [
-  { name: 'Depósito General', type: 'warehouse' },
-  { name: 'Sobrestock General', type: 'warehouse' },
-  { name: 'Sobrestock Thibe', type: 'warehouse' },
-  { name: 'Sobrestock Arenal', type: 'warehouse' },
-  { name: 'Sobrestock Arenal Import', type: 'warehouse' },
-  { name: 'Guadalupe', type: 'warehouse' },
-  { name: 'Justicia', type: 'warehouse' },
-  { name: 'Arnavia', type: 'warehouse' },
-  { name: 'Flex', type: 'warehouse' },
-  { name: 'Destino Comercial', type: 'external' }
+  { name: 'Deposito principal', type: 'warehouse' },
+  { name: 'Deposito secundario', type: 'warehouse' },
+  { name: 'Area de preparacion', type: 'warehouse' },
+  { name: 'Punto de venta', type: 'external' }
 ];
 
 async function seedLocations() {
