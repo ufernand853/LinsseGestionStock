@@ -66,18 +66,21 @@ router.put(
     if (dashboard && dashboard.manualAttentionIds !== undefined) {
       const incomingIds = normalizeManualAttentionIds(dashboard.manualAttentionIds);
       if (incomingIds.length > ATTENTION_MANUAL_LIMIT) {
-        throw new HttpError(400, `Solo se permiten ${ATTENTION_MANUAL_LIMIT} artículos.`);
+        throw new HttpError(400, `Solo se permiten ${ATTENTION_MANUAL_LIMIT} articulos.`);
       }
 
       for (const id of incomingIds) {
         if (!Types.ObjectId.isValid(id)) {
-          throw new HttpError(400, 'Identificador de artículo inválido.');
+          throw new HttpError(400, 'Identificador de articulo invalido.');
         }
       }
 
-      const existingCount = await Item.countDocuments({ _id: { $in: incomingIds } });
+      const existingCount = await Item.countDocuments({
+        _id: { $in: incomingIds },
+        tenant: req.user?.tenantId || null
+      });
       if (existingCount !== incomingIds.length) {
-        throw new HttpError(400, 'Algunos artículos seleccionados no existen.');
+        throw new HttpError(400, 'Algunos articulos seleccionados no existen.');
       }
 
       user.preferences = user.preferences || {};
@@ -94,7 +97,7 @@ router.get(
   '/dashboard/attention',
   requireAuth,
   asyncHandler(async (req, res) => {
-    const config = await DashboardConfig.getSingleton();
+    const config = await DashboardConfig.getSingleton(req.user.tenantId);
     await config.populate('updatedBy');
     res.json(serializeDashboardConfig(config));
   })
@@ -110,26 +113,29 @@ router.put(
 
     if (manualAttentionProvided) {
       if (incomingIds.length > ATTENTION_MANUAL_LIMIT) {
-        throw new HttpError(400, `Solo se permiten ${ATTENTION_MANUAL_LIMIT} artículos.`);
+        throw new HttpError(400, `Solo se permiten ${ATTENTION_MANUAL_LIMIT} articulos.`);
       }
 
       for (const id of incomingIds) {
         if (!Types.ObjectId.isValid(id)) {
-          throw new HttpError(400, 'Identificador de artículo inválido.');
+          throw new HttpError(400, 'Identificador de articulo invalido.');
         }
       }
 
-      const existingCount = await Item.countDocuments({ _id: { $in: incomingIds } });
+      const existingCount = await Item.countDocuments({
+        _id: { $in: incomingIds },
+        tenant: req.user?.tenantId || null
+      });
       if (existingCount !== incomingIds.length) {
-        throw new HttpError(400, 'Algunos artículos seleccionados no existen.');
+        throw new HttpError(400, 'Algunos articulos seleccionados no existen.');
       }
     }
 
-    const config = await DashboardConfig.getSingleton();
+    const config = await DashboardConfig.getSingleton(req.user.tenantId);
     if (recountThresholdDays !== undefined) {
       const numericThreshold = Number(recountThresholdDays);
       if (!Number.isFinite(numericThreshold) || numericThreshold < 0) {
-        throw new HttpError(400, 'El umbral debe ser un número mayor o igual a 0.');
+        throw new HttpError(400, 'El umbral debe ser un numero mayor o igual a 0.');
       }
       config.recountThresholdDays = Math.round(numericThreshold);
     }

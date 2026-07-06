@@ -54,7 +54,7 @@ router.post(
     if (existing) {
       throw new HttpError(400, 'El usuario ya existe');
     }
-    const role = await Role.findById(roleId);
+    const role = await Role.findOne({ _id: roleId, ...buildTenantFilter(req) });
     if (!role) {
       throw new HttpError(400, 'Rol inválido');
     }
@@ -100,7 +100,7 @@ router.put(
       user.passwordHash = await bcrypt.hash(password, 12);
     }
     if (roleId) {
-      const role = await Role.findById(roleId);
+      const role = await Role.findOne({ _id: roleId, ...buildTenantFilter(req) });
       if (!role) {
         throw new HttpError(400, 'Rol inválido');
       }

@@ -1,7 +1,8 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 const auditLogSchema = new Schema(
   {
+    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true, index: true },
     action: { type: String, required: true, trim: true },
     request: { type: String, required: true, trim: true },
     user: { type: String, required: true, trim: true },
@@ -13,6 +14,6 @@ const auditLogSchema = new Schema(
   }
 );
 
-auditLogSchema.index({ timestamp: -1 });
+auditLogSchema.index({ tenant: 1, timestamp: -1 });
 
 module.exports = model('AuditLog', auditLogSchema);

@@ -12,7 +12,7 @@ function parseQuantityComponent(value, label) {
   }
   const numeric = Number(value);
   if (!Number.isFinite(numeric) || numeric < 0 || !Number.isInteger(numeric)) {
-    throw new HttpError(400, `${label} debe ser un número entero mayor o igual a 0`);
+    throw new HttpError(400, `${label} debe ser un numero entero mayor o igual a 0`);
   }
   return numeric;
 }
@@ -34,7 +34,7 @@ function normalizeQuantityInput(value, { allowZero = false, fieldName = 'Cantida
   }
 
   if (typeof value !== 'object') {
-    throw new HttpError(400, `${fieldName} inválida`);
+    throw new HttpError(400, `${fieldName} invalida`);
   }
 
   const boxes = parseQuantityComponent(value.boxes, `${fieldName}: cajas`);
@@ -75,27 +75,38 @@ function isZeroQuantity(quantity) {
   return quantity.boxes === 0 && quantity.units === 0;
 }
 
-async function findItemOrThrow(itemId) {
+function buildTenantMatch(tenantId) {
+  return tenantId ? { tenant: tenantId } : { tenant: null };
+}
+
+async function findItemOrThrow(itemId, tenantId) {
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
-    throw new HttpError(404, 'Artículo no encontrado');
+    throw new HttpError(404, 'Articulo no encontrado');
   }
-  const item = await Item.findOne({ _id: itemId, deletedAt: null });
+  const item = await Item.findOne({ _id: itemId, deletedAt: null, ...buildTenantMatch(tenantId) });
   if (!item) {
-    throw new HttpError(404, 'Artículo no encontrado');
+    throw new HttpError(404, 'Articulo no encontrado');
   }
   return item;
 }
 
-async function ensureLocationExists(locationId, { allowedTypes = null, invalidTypeMessage = 'La ubicación seleccionada no es válida para esta operación' } = {}) {
+async function ensureLocationExists(
+  locationId,
+  {
+    tenantId,
+    allowedTypes = null,
+    invalidTypeMessage = 'La ubicacion seleccionada no es valida para esta operacion'
+  } = {}
+) {
   if (!mongoose.Types.ObjectId.isValid(locationId)) {
-    throw new HttpError(404, 'Ubicación no encontrada');
+    throw new HttpError(404, 'Ubicacion no encontrada');
   }
-  const location = await Location.findById(locationId);
+  const location = await Location.findOne({ _id: locationId, ...buildTenantMatch(tenantId) });
   if (!location) {
-    throw new HttpError(404, 'Ubicación no encontrada');
+    throw new HttpError(404, 'Ubicacion no encontrada');
   }
   if (location.status === 'inactive') {
-    throw new HttpError(400, 'La ubicación está inactiva');
+    throw new HttpError(400, 'La ubicacion esta inactiva');
   }
   if (Array.isArray(allowedTypes) && allowedTypes.length > 0 && !allowedTypes.includes(location.type)) {
     throw new HttpError(400, invalidTypeMessage);
@@ -115,7 +126,7 @@ function adjustItemStock(item, locationId, delta) {
     item.stock = stockMap;
   }
   const current = normalizeStoredQuantity(stockMap.get(locationId));
-  const updated = combineQuantities(current, delta, 'Stock insuficiente en la ubicación seleccionada');
+  const updated = combineQuantities(current, delta, 'Stock insuficiente en la ubicacion seleccionada');
   if (isZeroQuantity(updated)) {
     stockMap.delete(locationId);
   } else {
@@ -134,8 +145,9 @@ function sanitizeMetadata(metadata = {}) {
   }, {});
 }
 
-async function addMovementLog(movementRequestId, action, actorUserId, metadata = {}) {
+async function addMovementLog(movementRequestId, action, actorUserId, metadata = {}, tenantId) {
   await MovementLog.create({
+    tenant: tenantId,
     movementRequest: movementRequestId,
     action,
     actor: actorUserId,
@@ -155,23 +167,21 @@ function inferMovementType(fromLocation, toLocation) {
 }
 
 async function executeMovement(request, actorUserId, metadata = {}) {
-  const item = await findItemOrThrow(request.item);
+  const item = await findItemOrThrow(request.item, request.tenant);
   const quantity = normalizeStoredQuantity(request.quantity);
 
   const fromLocationId = request.fromLocation?.toString();
   const toLocationId = request.toLocation?.toString();
   if (!fromLocationId || !toLocationId) {
-    throw new HttpError(400, 'Los movimientos requieren ubicaciones de origen y destino válidas');
+    throw new HttpError(400, 'Los movimientos requieren ubicaciones de origen y destino validas');
   }
 
   const [fromLocation, toLocation] = await Promise.all([
-    ensureLocationExists(fromLocationId),
-    ensureLocationExists(toLocationId)
+    ensureLocationExists(fromLocationId, { tenantId: request.tenant }),
+    ensureLocationExists(toLocationId, { tenantId: request.tenant })
   ]);
 
   const movementType = inferMovementType(fromLocation, toLocation);
-
-  // Actualizar el tipo almacenado en caso de que se haya guardado incorrectamente
   request.type = movementType;
 
   if (movementType !== 'ingress') {
@@ -192,10 +202,10 @@ async function executeMovement(request, actorUserId, metadata = {}) {
   }
   request.executedAt = new Date();
   await request.save();
-  await addMovementLog(request.id, 'executed', actorUserId, metadata);
+  await addMovementLog(request.id, 'executed', actorUserId, metadata, request.tenant);
 }
 
-async function validateMovementPayload(payload) {
+async function validateMovementPayload(payload, tenantId) {
   if (!payload.itemId) {
     throw new HttpError(400, 'Debe indicarse itemId');
   }
@@ -210,23 +220,25 @@ async function validateMovementPayload(payload) {
   const toLocationId = payload.toLocation || payload.toDeposit;
 
   if (!fromLocationId) {
-    throw new HttpError(400, 'Debe indicarse la ubicación de origen');
+    throw new HttpError(400, 'Debe indicarse la ubicacion de origen');
   }
   if (!toLocationId) {
-    throw new HttpError(400, 'Debe indicarse la ubicación de destino');
+    throw new HttpError(400, 'Debe indicarse la ubicacion de destino');
   }
   if (fromLocationId === toLocationId) {
-    throw new HttpError(400, 'La ubicación de origen y destino no pueden ser la misma');
+    throw new HttpError(400, 'La ubicacion de origen y destino no pueden ser la misma');
   }
 
   const [fromLocation, toLocation] = await Promise.all([
     ensureLocationExists(fromLocationId, {
+      tenantId,
       allowedTypes: ['warehouse', 'externalOrigin'],
-      invalidTypeMessage: 'La ubicación de origen debe ser un depósito interno o un origen externo válido'
+      invalidTypeMessage: 'La ubicacion de origen debe ser un deposito interno o un origen externo valido'
     }),
     ensureLocationExists(toLocationId, {
+      tenantId,
       allowedTypes: ['warehouse', 'external'],
-      invalidTypeMessage: 'La ubicación de destino debe ser un depósito interno o un destino externo válido'
+      invalidTypeMessage: 'La ubicacion de destino debe ser un deposito interno o un destino externo valido'
     })
   ]);
 

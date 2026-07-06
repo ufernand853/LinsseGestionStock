@@ -8,6 +8,10 @@ const { normalizeStoredQuantity } = require('../services/stockService');
 
 const router = express.Router();
 
+function buildTenantFilter(req) {
+  return req.user?.tenantId ? { tenant: req.user.tenantId } : { tenant: null };
+}
+
 function ensureQuantity(value) {
   const normalized = normalizeStoredQuantity(value);
   return {
@@ -64,9 +68,9 @@ router.get(
     const isRequestingUngrouped = requestedGroupId === 'ungrouped';
 
     const [items, groups, locations] = await Promise.all([
-      Item.find({ deletedAt: null }).populate('group'),
-      Group.find(),
-      Location.find()
+      Item.find({ ...buildTenantFilter(req), deletedAt: null }).populate('group'),
+      Group.find(buildTenantFilter(req)),
+      Location.find(buildTenantFilter(req))
     ]);
     const locationsById = new Map(
       locations.map(location => [location.id, { id: location.id, name: location.name, status: location.status, type: location.type }])
@@ -165,8 +169,8 @@ async function respondStockByLocation(req, res) {
   const requestedLocationId = typeof req.query.locationId === 'string' ? req.query.locationId : null;
 
   const [items, locations] = await Promise.all([
-    Item.find({ deletedAt: null }),
-    Location.find({ type: 'warehouse' })
+    Item.find({ ...buildTenantFilter(req), deletedAt: null }),
+    Location.find({ ...buildTenantFilter(req), type: 'warehouse' })
   ]);
   const locationsById = new Map(
     locations.map(location => [

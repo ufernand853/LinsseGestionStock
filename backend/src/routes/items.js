@@ -550,7 +550,7 @@ router.get(
     const filter = { ...buildTenantFilter(req), deletedAt: null };
     const normalizedGroupId = typeof groupId === 'string' ? groupId.trim() : '';
     if (normalizedGroupId) {
-      const groupIds = await collectGroupAndDescendantIds(normalizedGroupId);
+      const groupIds = await collectGroupAndDescendantIds(normalizedGroupId, req.user?.tenantId);
       const groupFilterValues = buildGroupFilterValues(groupIds);
       if (groupFilterValues.length === 0) {
         return res.json({ total: 0, page: pageNumber, pageSize: limit, items: [] });
@@ -605,7 +605,7 @@ router.get(
     const { page = '1', pageSize = '20', search, groupId } = req.query || {};
     const pageNumber = Math.max(parseInt(page, 10) || 1, 1);
     const limit = Math.min(Math.max(parseInt(pageSize, 10) || 20, 1), 200);
-    const overstockGroups = await Group.find({ name: /sobrestock/i }).sort({ name: 1 });
+    const overstockGroups = await Group.find({ ...buildTenantFilter(req), name: /sobrestock/i }).sort({ name: 1 });
     if (overstockGroups.length === 0) {
       return res.json({ total: 0, page: pageNumber, pageSize: limit, groups: [], items: [] });
     }
@@ -628,7 +628,7 @@ router.get(
 
     const [candidateItems, locations] = await Promise.all([
       Item.find(filter).populate('group').sort({ updatedAt: -1 }),
-      Location.find().sort({ name: 1 })
+      Location.find(buildTenantFilter(req)).sort({ name: 1 })
     ]);
     const locationNames = new Map(locations.map(location => [String(location.id), location.name]));
     const serializedItems = candidateItems.map(item => {
@@ -677,6 +677,7 @@ router.post(
       action: 'Recuento',
       request: `Recuento total iniciado para ${total} artículo(s)`,
       user: req.user?.username || 'Desconocido',
+      tenant: req.user?.tenantId,
       details: { total, alreadyPending, changed }
     });
     res.json({ total, alreadyPending, changed });
@@ -709,6 +710,7 @@ router.patch(
       action: 'Recuento',
       request: `Recuento confirmado: ${item.code} - ${item.description}`,
       user: req.user?.username || 'Desconocido',
+      tenant: req.user?.tenantId,
       details: { itemId: item.id, before, after, changes: buildItemAuditChanges(before, after) }
     });
     res.json(serializeItem(populated));
@@ -732,6 +734,7 @@ router.post(
       action: 'Artículo',
       request: `Restauración de artículo: ${item.code} - ${item.description}`,
       user: req.user?.username || 'Desconocido',
+      tenant: req.user?.tenantId,
       details: { itemId: item.id, code: item.code }
     });
     res.json(serializeItem(populated));
@@ -784,7 +787,7 @@ router.post(
       if (!Types.ObjectId.isValid(normalizedGroupId)) {
         throw new HttpError(400, 'Grupo inválido');
       }
-      group = await Group.findById(normalizedGroupId);
+      group = await Group.findOne({ _id: normalizedGroupId, ...tenantFilter });
       if (!group) {
         throw new HttpError(400, 'Grupo inválido');
       }
@@ -838,6 +841,7 @@ router.post(
       action: 'Artículo',
       request: buildItemAuditSummary('Alta de artículo', auditSnapshot),
       user: req.user?.username || 'Desconocido',
+      tenant: req.user?.tenantId,
       details: {
         summary: buildItemAuditSummary('Alta de artículo', auditSnapshot),
         item: auditSnapshot
@@ -887,7 +891,7 @@ router.put(
         if (!Types.ObjectId.isValid(normalizedGroupId)) {
           throw new HttpError(400, 'Grupo inválido');
         }
-        const group = await Group.findById(normalizedGroupId);
+        const group = await Group.findOne({ _id: normalizedGroupId, ...buildTenantFilter(req) });
         if (!group) {
           throw new HttpError(400, 'Grupo inválido');
         }
@@ -1042,6 +1046,7 @@ router.put(
       action: 'Artículo',
       request: buildItemAuditSummary('Actualización de artículo', afterAuditSnapshot),
       user: req.user?.username || 'Desconocido',
+      tenant: req.user?.tenantId,
       details: {
         summary: buildItemAuditSummary('Actualización de artículo', afterAuditSnapshot),
         item: afterAuditSnapshot,
@@ -1076,6 +1081,7 @@ router.delete(
       action: 'Artículo',
       request: buildItemAuditSummary('Artículo enviado a papelera', auditSnapshot),
       user: req.user?.username || 'Desconocido',
+      tenant: req.user?.tenantId,
       details: {
         summary: buildItemAuditSummary('Artículo enviado a papelera', auditSnapshot),
         item: auditSnapshot

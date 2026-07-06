@@ -1,67 +1,22 @@
 const bcrypt = require('bcryptjs');
+const config = require('./config');
 const Role = require('./models/Role');
 const User = require('./models/User');
 const Group = require('./models/Group');
-const config = require('./config');
 const Location = require('./models/Location');
 const Item = require('./models/Item');
 const SubscriptionPlan = require('./models/SubscriptionPlan');
 const Tenant = require('./models/Tenant');
-
-const defaultRoles = [
-  {
-    name: 'Administrador',
-    permissions: [
-      'items.read',
-      'items.write',
-      'stock.request',
-      'stock.approve',
-      'stock.logs.read',
-      'users.read',
-      'users.write',
-      'reports.read'
-    ]
-  },
-  {
-    name: 'Operador',
-    permissions: ['items.read', 'items.write', 'stock.request', 'reports.read']
-  },
-  {
-    name: 'Supervisor',
-    permissions: ['items.read', 'stock.request', 'reports.read']
-  },
-  {
-    name: 'Consulta',
-    permissions: ['items.read', 'reports.read']
-  }
-];
+const MovementRequest = require('./models/MovementRequest');
+const MovementLog = require('./models/MovementLog');
+const AuditLog = require('./models/AuditLog');
+const DashboardConfig = require('./models/DashboardConfig');
+const { ensureTenantSeedData } = require('./services/tenantProvisioningService');
 
 const defaultPlans = [
-  { code: 'BASIC', name: 'Básico', priceUsdMonthly: 10, priceAmount: 390, currency: 'UYU', productLimit: 100, description: 'Para pequeños comercios', ctaLabel: 'Contratar' },
+  { code: 'BASIC', name: 'Basico', priceUsdMonthly: 10, priceAmount: 390, currency: 'UYU', productLimit: 100, description: 'Para pequenos comercios', ctaLabel: 'Contratar' },
   { code: 'PRO', name: 'Pro', priceUsdMonthly: 50, priceAmount: 1990, currency: 'UYU', productLimit: 500, description: 'Hasta 500 productos', ctaLabel: 'Contratar' },
-  { code: 'ENTERPRISE', name: 'Empresa', priceUsdMonthly: null, priceAmount: null, currency: 'UYU', productLimit: null, description: 'Sin límites, integraciones y varias sucursales', ctaLabel: 'Solicitar demo' }
-];
-
-const defaultGroups = [
-  'MEDIAS',
-  'ROPA INTERIOR',
-  'MANIQUÍ',
-  'BLANCOS',
-  'ACCESORIOS',
-  'JEAN HOMBRE',
-  'JEAN DAMA',
-  'JEAN NIÑO/A',
-  'ROPA HOMBRE',
-  'ROPA DAMA',
-  'ROPA NIÑO/A',
-  'CALZADO',
-  'ELECTRÓNICOS Y BAZAR',
-  'JUGUETES',
-  'ESCOLARES',
-  'SOBRESTOCK GENERAL',
-  'SOBRESTOCK THIBE',
-  'SOBRESTOCK ARENAL IMPORT',
-  'CLIENTES'
+  { code: 'ENTERPRISE', name: 'Empresa', priceUsdMonthly: null, priceAmount: null, currency: 'UYU', productLimit: null, description: 'Sin limites, integraciones y varias sucursales', ctaLabel: 'Solicitar demo' }
 ];
 
 async function seedPlans() {
@@ -84,31 +39,11 @@ async function ensureDefaultTenant() {
   return tenant;
 }
 
-async function seedRoles() {
-  for (const role of defaultRoles) {
-    const existing = await Role.findOne({ name: role.name });
-    if (!existing) {
-      await Role.create(role);
-    }
-  }
-}
-
-async function seedGroups() {
-  const hasAnyGroup = await Group.exists({});
-  if (hasAnyGroup) {
-    return;
-  }
-
-  for (const name of defaultGroups) {
-    await Group.create({ name });
-  }
-}
-
 async function seedAdminUser(defaultTenant) {
   const adminEmail = config.adminEmail;
   let admin = await User.findOne({ email: adminEmail }).populate('role');
   if (!admin) {
-    const adminRole = await Role.findOne({ name: 'Administrador' });
+    const adminRole = await Role.findOne({ tenant: defaultTenant.id, name: 'Administrador' });
     const passwordHash = await bcrypt.hash(config.adminPassword, 12);
     admin = await User.create({
       username: 'admin',
@@ -121,6 +56,12 @@ async function seedAdminUser(defaultTenant) {
     console.log(`Usuario administrador creado con email ${adminEmail}`);
   } else if (!admin.tenant) {
     admin.tenant = defaultTenant.id;
+    if (!admin.role) {
+      const adminRole = await Role.findOne({ tenant: defaultTenant.id, name: 'Administrador' });
+      if (adminRole) {
+        admin.role = adminRole.id;
+      }
+    }
     await admin.save();
   }
 }
@@ -129,6 +70,55 @@ const defaultLocations = [];
 
 async function attachLegacyItemsToDefaultTenant(defaultTenant) {
   await Item.updateMany(
+    { $or: [{ tenant: { $exists: false } }, { tenant: null }] },
+    { $set: { tenant: defaultTenant.id } }
+  );
+}
+
+async function attachLegacyLocationsToDefaultTenant(defaultTenant) {
+  await Location.updateMany(
+    { $or: [{ tenant: { $exists: false } }, { tenant: null }] },
+    { $set: { tenant: defaultTenant.id } }
+  );
+}
+
+async function attachLegacyGroupsToDefaultTenant(defaultTenant) {
+  await Group.updateMany(
+    { $or: [{ tenant: { $exists: false } }, { tenant: null }] },
+    { $set: { tenant: defaultTenant.id } }
+  );
+}
+
+async function attachLegacyRolesToDefaultTenant(defaultTenant) {
+  await Role.updateMany(
+    { $or: [{ tenant: { $exists: false } }, { tenant: null }] },
+    { $set: { tenant: defaultTenant.id } }
+  );
+}
+
+async function attachLegacyMovementRequestsToDefaultTenant(defaultTenant) {
+  await MovementRequest.updateMany(
+    { $or: [{ tenant: { $exists: false } }, { tenant: null }] },
+    { $set: { tenant: defaultTenant.id } }
+  );
+}
+
+async function attachLegacyMovementLogsToDefaultTenant(defaultTenant) {
+  await MovementLog.updateMany(
+    { $or: [{ tenant: { $exists: false } }, { tenant: null }] },
+    { $set: { tenant: defaultTenant.id } }
+  );
+}
+
+async function attachLegacyAuditLogsToDefaultTenant(defaultTenant) {
+  await AuditLog.updateMany(
+    { $or: [{ tenant: { $exists: false } }, { tenant: null }] },
+    { $set: { tenant: defaultTenant.id } }
+  );
+}
+
+async function attachLegacyDashboardConfigToDefaultTenant(defaultTenant) {
+  await DashboardConfig.updateMany(
     { $or: [{ tenant: { $exists: false } }, { tenant: null }] },
     { $set: { tenant: defaultTenant.id } }
   );
@@ -145,14 +135,32 @@ async function seedLocations() {
   }
 }
 
+async function syncTenantIndexes() {
+  await Promise.all([
+    Group.syncIndexes(),
+    Role.syncIndexes(),
+    MovementRequest.syncIndexes(),
+    MovementLog.syncIndexes(),
+    AuditLog.syncIndexes(),
+    DashboardConfig.syncIndexes()
+  ]);
+}
+
 async function seed() {
   await seedPlans();
   const defaultTenant = await ensureDefaultTenant();
-  await seedRoles();
-  await seedGroups();
+  await attachLegacyRolesToDefaultTenant(defaultTenant);
+  await attachLegacyGroupsToDefaultTenant(defaultTenant);
+  await ensureTenantSeedData(defaultTenant.id);
   await seedLocations();
   await seedAdminUser(defaultTenant);
   await attachLegacyItemsToDefaultTenant(defaultTenant);
+  await attachLegacyLocationsToDefaultTenant(defaultTenant);
+  await attachLegacyMovementRequestsToDefaultTenant(defaultTenant);
+  await attachLegacyMovementLogsToDefaultTenant(defaultTenant);
+  await attachLegacyAuditLogsToDefaultTenant(defaultTenant);
+  await attachLegacyDashboardConfigToDefaultTenant(defaultTenant);
+  await syncTenantIndexes();
 }
 
 module.exports = seed;

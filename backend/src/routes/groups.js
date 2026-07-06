@@ -7,11 +7,15 @@ const Item = require('../models/Item');
 
 const router = express.Router();
 
+function buildTenantFilter(req) {
+  return req.user?.tenantId ? { tenant: req.user.tenantId } : { tenant: null };
+}
+
 router.get(
   '/',
   requirePermission('items.read'),
   asyncHandler(async (req, res) => {
-    const groups = await Group.find().sort({ name: 1 });
+    const groups = await Group.find(buildTenantFilter(req)).sort({ name: 1 });
     res.json(groups);
   })
 );
@@ -27,13 +31,17 @@ router.post(
     const normalizedName = name.trim();
     let parent = null;
     if (parentId) {
-      parent = await Group.findById(parentId);
+      parent = await Group.findOne({ _id: parentId, ...buildTenantFilter(req) });
       if (!parent) {
-        throw new HttpError(400, 'Grupo padre inválido');
+        throw new HttpError(400, 'Grupo padre invalido');
       }
     }
     try {
-      const group = await Group.create({ name: normalizedName, parent: parent ? parent.id : null });
+      const group = await Group.create({
+        tenant: req.user?.tenantId || null,
+        name: normalizedName,
+        parent: parent ? parent.id : null
+      });
       res.status(201).json(group);
     } catch (error) {
       if (error?.code === 11000) {
@@ -49,7 +57,7 @@ router.put(
   requirePermission('items.write'),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const group = await Group.findById(id);
+    const group = await Group.findOne({ _id: id, ...buildTenantFilter(req) });
     if (!group) {
       throw new HttpError(404, 'Grupo no encontrado');
     }
@@ -69,11 +77,11 @@ router.put(
         updates.parent = null;
       } else {
         if (parentId === id) {
-          throw new HttpError(400, 'Un grupo no puede ser padre de sí mismo');
+          throw new HttpError(400, 'Un grupo no puede ser padre de si mismo');
         }
-        const parent = await Group.findById(parentId);
+        const parent = await Group.findOne({ _id: parentId, ...buildTenantFilter(req) });
         if (!parent) {
-          throw new HttpError(400, 'Grupo padre inválido');
+          throw new HttpError(400, 'Grupo padre invalido');
         }
         let current = parent;
         while (current) {
@@ -83,7 +91,7 @@ router.put(
           if (!current.parent) {
             break;
           }
-          current = await Group.findById(current.parent);
+          current = await Group.findOne({ _id: current.parent, ...buildTenantFilter(req) });
         }
         updates.parent = parent.id;
       }
@@ -109,14 +117,14 @@ router.delete(
   requirePermission('items.write'),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const group = await Group.findById(id);
+    const group = await Group.findOne({ _id: id, ...buildTenantFilter(req) });
     if (!group) {
       throw new HttpError(404, 'Grupo no encontrado');
     }
 
     const [childCount, itemCount] = await Promise.all([
-      Group.countDocuments({ parent: group._id }),
-      Item.countDocuments({ group: group._id })
+      Group.countDocuments({ parent: group._id, ...buildTenantFilter(req) }),
+      Item.countDocuments({ tenant: req.user?.tenantId || null, group: group._id })
     ]);
 
     if (childCount > 0) {
@@ -124,7 +132,7 @@ router.delete(
     }
 
     if (itemCount > 0) {
-      throw new HttpError(400, 'No se puede eliminar un grupo con artículos asociados');
+      throw new HttpError(400, 'No se puede eliminar un grupo con articulos asociados');
     }
 
     await group.deleteOne();

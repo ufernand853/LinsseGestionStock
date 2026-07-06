@@ -125,13 +125,14 @@ router.delete(
     }
 
     const hasMovements = await MovementRequest.exists({
+      tenant: req.user?.tenantId || null,
       $or: [{ fromLocation: id }, { toLocation: id }]
     });
     if (hasMovements) {
       throw new HttpError(400, 'No se puede eliminar una ubicación con movimientos asociados.');
     }
 
-    const hasStock = await Item.exists({ [`stock.${id}`]: { $exists: true } });
+    const hasStock = await Item.exists({ ...buildTenantFilter(req), [`stock.${id}`]: { $exists: true } });
     if (hasStock) {
       throw new HttpError(400, 'No se puede eliminar una ubicación con stock asignado.');
     }

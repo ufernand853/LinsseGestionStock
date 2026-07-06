@@ -15,6 +15,7 @@ const {
   addMovementLog,
   findItemOrThrow,
   ensureLocationExists,
+  normalizeQuantityInput,
   normalizeStoredQuantity
 } = require('../services/stockService');
 const { recordAuditEvent } = require('../services/auditService');
@@ -316,7 +317,11 @@ function requestMetadata(req) {
   };
 }
 
-async function resolveItemIdentifier(rawValue) {
+function buildTenantFilter(req) {
+  return req.user?.tenantId ? { tenant: req.user.tenantId } : { tenant: null };
+}
+
+async function resolveItemIdentifier(rawValue, tenantId) {
   if (typeof rawValue !== 'string') {
     return null;
   }
@@ -328,6 +333,7 @@ async function resolveItemIdentifier(rawValue) {
     return trimmed;
   }
   const item = await Item.findOne({
+    tenant: tenantId || null,
     code: new RegExp(`^${escapeRegex(trimmed)}$`, 'i'),
     deletedAt: null
   })
@@ -352,10 +358,10 @@ router.get(
       limit: rawLimit
     } = req.query || {};
 
-    const filter = { deletedAt: null };
+    const filter = { ...buildTenantFilter(req), deletedAt: null };
     const normalizedGroupId = typeof groupId === 'string' ? groupId.trim() : '';
     if (normalizedGroupId) {
-      const groupIds = await collectGroupAndDescendantIds(normalizedGroupId);
+      const groupIds = await collectGroupAndDescendantIds(normalizedGroupId, req.user?.tenantId);
       const groupFilterValues = buildGroupFilterValues(groupIds);
       if (groupFilterValues.length === 0) {
         return res.json([]);
@@ -427,7 +433,7 @@ router.delete(
     }
 
     const { id } = req.params;
-    const request = await MovementRequest.findById(id).populate([
+    const request = await MovementRequest.findOne({ _id: id, ...buildTenantFilter(req) }).populate([
       'item',
       { path: 'requestedBy', populate: 'role' },
       { path: 'approvedBy', populate: 'role' },
@@ -439,11 +445,12 @@ router.delete(
     }
 
     await Promise.all([
-      MovementLog.deleteMany({ movementRequest: request.id }),
+      MovementLog.deleteMany({ movementRequest: request.id, tenant: req.user?.tenantId || null }),
       request.deleteOne()
     ]);
 
     await recordAuditEvent({
+      tenant: req.user?.tenantId,
       action: 'Solicitud de movimiento',
       request: buildMovementAuditSummary('Eliminación de solicitud', request),
       user: req.user?.username || 'Desconocido',
@@ -459,12 +466,13 @@ router.post(
   requirePermission('stock.request'),
   asyncHandler(async (req, res) => {
     const body = req.body || {};
-    const { quantity, fromLocation, toLocation } = await validateMovementPayload(body);
-    await findItemOrThrow(body.itemId);
+    const { quantity, fromLocation, toLocation } = await validateMovementPayload(body, req.user?.tenantId);
+    await findItemOrThrow(body.itemId, req.user?.tenantId);
 
     const movementType = determineMovementType(fromLocation, toLocation);
 
     const movementRequest = new MovementRequest({
+      tenant: req.user?.tenantId || null,
       item: body.itemId,
       type: movementType,
       fromLocation: fromLocation._id,
@@ -477,7 +485,7 @@ router.post(
     });
 
     await movementRequest.save();
-    await addMovementLog(movementRequest.id, 'requested', req.user.id, requestMetadata(req));
+    await addMovementLog(movementRequest.id, 'requested', req.user.id, requestMetadata(req), req.user?.tenantId);
 
     const populated = await movementRequest.populate([
       'item',
@@ -487,6 +495,7 @@ router.post(
       'toLocation'
     ]);
     await recordAuditEvent({
+      tenant: req.user?.tenantId,
       action: 'Solicitud de movimiento',
       request: buildMovementAuditSummary('Nueva solicitud', populated),
       user: req.user?.username || 'Desconocido',
@@ -501,7 +510,7 @@ router.post(
   requirePermission('stock.approve'),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const request = await MovementRequest.findById(id);
+    const request = await MovementRequest.findOne({ _id: id, ...buildTenantFilter(req) });
     if (!request) {
       throw new HttpError(404, 'Solicitud no encontrada');
     }
@@ -511,7 +520,7 @@ router.post(
     request.status = 'approved';
     request.approvedBy = req.user.id;
     request.approvedAt = new Date();
-    await addMovementLog(request.id, 'approved', req.user.id, requestMetadata(req));
+    await addMovementLog(request.id, 'approved', req.user.id, requestMetadata(req), req.user?.tenantId);
     await executeMovement(request, req.user.id, requestMetadata(req));
     const populated = await request.populate([
       'item',
@@ -521,6 +530,7 @@ router.post(
       'toLocation'
     ]);
     await recordAuditEvent({
+      tenant: req.user?.tenantId,
       action: 'Solicitud de movimiento',
       request: buildMovementAuditSummary('Aprobación de solicitud', populated),
       user: req.user?.username || 'Desconocido',
@@ -536,7 +546,7 @@ router.post(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { reason } = req.body || {};
-    const request = await MovementRequest.findById(id);
+    const request = await MovementRequest.findOne({ _id: id, ...buildTenantFilter(req) });
     if (!request) {
       throw new HttpError(404, 'Solicitud no encontrada');
     }
@@ -548,7 +558,7 @@ router.post(
     request.approvedBy = req.user.id;
     request.approvedAt = new Date();
     await request.save();
-    await addMovementLog(request.id, 'rejected', req.user.id, requestMetadata(req));
+    await addMovementLog(request.id, 'rejected', req.user.id, requestMetadata(req), req.user?.tenantId);
     const populated = await request.populate([
       'item',
       { path: 'requestedBy', populate: 'role' },
@@ -557,6 +567,7 @@ router.post(
       'toLocation'
     ]);
     await recordAuditEvent({
+      tenant: req.user?.tenantId,
       action: 'Solicitud de movimiento',
       request: buildMovementAuditSummary('Rechazo de solicitud', populated),
       user: req.user?.username || 'Desconocido',
@@ -584,10 +595,12 @@ router.post(
     const toLocationId = body.toLocation || body.toDeposit;
     const [fromLocation, toLocation] = await Promise.all([
       ensureLocationExists(fromLocationId, {
+        tenantId: req.user?.tenantId,
         allowedTypes: ['externalOrigin'],
         invalidTypeMessage: 'El origen debe ser una ubicación de tipo origen externo'
       }),
       ensureLocationExists(toLocationId, {
+        tenantId: req.user?.tenantId,
         allowedTypes: ['warehouse'],
         invalidTypeMessage: 'El destino debe ser un depósito interno'
       })
@@ -595,9 +608,10 @@ router.post(
 
     const created = [];
     for (const [index, line] of lines.entries()) {
-      const item = await findItemOrThrow(line.itemId);
+      const item = await findItemOrThrow(line.itemId, req.user?.tenantId);
       const quantity = normalizeQuantityInput(line.quantity, { fieldName: `Cantidad del renglón ${index + 1}` });
       const movementRequest = new MovementRequest({
+        tenant: req.user?.tenantId || null,
         item: item.id,
         type: 'ingress',
         fromLocation: fromLocation.id,
@@ -611,8 +625,8 @@ router.post(
         approvedAt: new Date()
       });
       await movementRequest.save();
-      await addMovementLog(movementRequest.id, 'requested', req.user.id, requestMetadata(req));
-      await addMovementLog(movementRequest.id, 'approved', req.user.id, requestMetadata(req));
+      await addMovementLog(movementRequest.id, 'requested', req.user.id, requestMetadata(req), req.user?.tenantId);
+      await addMovementLog(movementRequest.id, 'approved', req.user.id, requestMetadata(req), req.user?.tenantId);
       await executeMovement(movementRequest, req.user.id, requestMetadata(req));
       const populated = await movementRequest.populate([
         'item',
@@ -628,6 +642,7 @@ router.post(
       action: 'Recepción por código de barras',
       request: `Recepción confirmada: ${created.length} artículo(s) | Origen: ${fromLocation.name} | Destino: ${toLocation.name}`,
       user: req.user?.username || 'Desconocido',
+      tenant: req.user?.tenantId,
       details: {
         fromLocation: serializeLocationSummary(fromLocation),
         toLocation: serializeLocationSummary(toLocation),
@@ -645,7 +660,7 @@ router.get(
   asyncHandler(async (req, res) => {
     ensureStockAccess(req);
     const { status, type, from, to, itemId, itemCode, requestedBy, profile } = req.query || {};
-    const filter = {};
+    const filter = buildTenantFilter(req);
     const normalizedType = typeof type === 'string' ? type.trim() : '';
     if (status) {
       filter.status = status;
@@ -653,8 +668,8 @@ router.get(
     const normalizedItemId = typeof itemId === 'string' ? itemId.trim() : '';
     const normalizedItemCode = typeof itemCode === 'string' ? itemCode.trim() : '';
     if (normalizedItemId || normalizedItemCode) {
-      const resolvedFromId = normalizedItemId ? await resolveItemIdentifier(normalizedItemId) : null;
-      const resolvedFromCode = normalizedItemCode ? await resolveItemIdentifier(normalizedItemCode) : null;
+      const resolvedFromId = normalizedItemId ? await resolveItemIdentifier(normalizedItemId, req.user?.tenantId) : null;
+      const resolvedFromCode = normalizedItemCode ? await resolveItemIdentifier(normalizedItemCode, req.user?.tenantId) : null;
 
       if (normalizedItemId && !resolvedFromId) {
         return res.json([]);
@@ -701,6 +716,7 @@ router.get(
         requesterFilter = normalizedRequester;
       } else {
         const requesterDoc = await User.findOne({
+          ...buildTenantFilter(req),
           $or: [
             { username: new RegExp(`^${escapeRegex(normalizedRequester)}$`, 'i') },
             { email: new RegExp(`^${escapeRegex(normalizedRequester)}$`, 'i') }
@@ -720,7 +736,10 @@ router.get(
       if (Types.ObjectId.isValid(normalizedProfile)) {
         roleId = normalizedProfile;
       } else {
-        const roleDoc = await Role.findOne({ name: new RegExp(`^${escapeRegex(normalizedProfile)}$`, 'i') })
+        const roleDoc = await Role.findOne({
+          tenant: req.user?.tenantId || null,
+          name: new RegExp(`^${escapeRegex(normalizedProfile)}$`, 'i')
+        })
           .select('_id')
           .lean();
         roleId = roleDoc?._id || null;
@@ -730,7 +749,7 @@ router.get(
         return res.json([]);
       }
 
-      const roleUserIds = await User.find({ role: roleId })
+      const roleUserIds = await User.find({ ...buildTenantFilter(req), role: roleId })
         .select('_id')
         .lean();
       const allowedIds = new Set(roleUserIds.map(doc => String(doc._id)));
@@ -773,7 +792,7 @@ router.post(
   requirePermission('stock.request'),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const request = await MovementRequest.findById(id);
+    const request = await MovementRequest.findOne({ _id: id, ...buildTenantFilter(req) });
     if (!request) {
       throw new HttpError(404, 'Solicitud no encontrada');
     }
@@ -786,7 +805,7 @@ router.post(
     request.approvedBy = null;
     request.rejectedReason = null;
     await request.save();
-    await addMovementLog(request.id, 'resubmitted', req.user.id, requestMetadata(req));
+    await addMovementLog(request.id, 'resubmitted', req.user.id, requestMetadata(req), req.user?.tenantId);
     const populated = await request.populate([
       'item',
       { path: 'requestedBy', populate: 'role' },
@@ -809,7 +828,7 @@ router.get(
   requireAuth,
   asyncHandler(async (req, res) => {
     const { type } = req.query || {};
-    const filters = {};
+    const filters = buildTenantFilter(req);
     if (type) {
       filters.type = type;
     }
