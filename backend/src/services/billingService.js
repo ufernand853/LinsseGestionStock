@@ -8,6 +8,7 @@ const BillingEvent = require('../models/BillingEvent');
 const { HttpError } = require('../utils/errors');
 const mercadoPagoService = require('./mercadoPagoService');
 const { serializePlan } = require('./licenseSerializer');
+const { ensureTenantSeedData } = require('./tenantProvisioningService');
 
 function mapMercadoPagoStatus(status) {
   switch (status) {
@@ -54,7 +55,7 @@ async function createMercadoPagoSubscription({ tenant, plan, payerEmail }) {
 async function retryExistingRegistration({ existingUser, companyName, password, plan, payerEmail }) {
   const validPassword = await bcrypt.compare(password, existingUser.passwordHash);
   if (!validPassword) {
-    throw new HttpError(400, 'Ya existe un usuario con ese email. Indicá la contraseña correcta para reintentar el pago.');
+    throw new HttpError(400, 'Ya existe un usuario con ese email. Indica la contrasena correcta para reintentar el pago.');
   }
   const tenant = await Tenant.findById(existingUser.tenant);
   if (!tenant) {
@@ -99,28 +100,32 @@ async function retryExistingRegistration({ existingUser, companyName, password, 
 
 async function registerTenant({ companyName, billingEmail, username, password, planCode }) {
   if (!companyName || !billingEmail || !username || !password || !planCode) {
-    throw new HttpError(400, 'Empresa, email, usuario, contraseña y plan son obligatorios');
+    throw new HttpError(400, 'Empresa, email, usuario, contrasena y plan son obligatorios');
   }
   const normalizedEmail = billingEmail.toLowerCase().trim();
   const normalizedPlanCode = planCode.toUpperCase().trim();
   const plan = await SubscriptionPlan.findOne({ code: normalizedPlanCode, isActive: true });
   if (!plan) {
-    throw new HttpError(400, 'Plan inválido o inactivo');
+    throw new HttpError(400, 'Plan invalido o inactivo');
   }
   const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser) {
     return retryExistingRegistration({ existingUser, companyName, password, plan, payerEmail: normalizedEmail });
   }
-  const adminRole = await Role.findOne({ name: 'Administrador' });
-  if (!adminRole) {
-    throw new HttpError(500, 'No existe el rol Administrador. Ejecutá el seed inicial.');
-  }
+
   const tenant = await Tenant.create({
     name: companyName,
     billingEmail: normalizedEmail,
     plan: plan.id,
     subscriptionStatus: plan.priceAmount ? 'trialing' : 'active'
   });
+  await ensureTenantSeedData(tenant.id);
+
+  const adminRole = await Role.findOne({ tenant: tenant.id, name: 'Administrador' });
+  if (!adminRole) {
+    throw new HttpError(500, 'No se pudo preparar el rol Administrador para el tenant.');
+  }
+
   const passwordHash = await bcrypt.hash(password, 12);
   const user = await User.create({
     username,
@@ -144,7 +149,7 @@ async function registerTenant({ companyName, billingEmail, username, password, p
 async function refreshMercadoPagoSubscription(preapprovalId, payload = null) {
   const providerData = preapprovalId ? await mercadoPagoService.getSubscription(preapprovalId) : payload;
   if (!providerData?.id) {
-    throw new HttpError(400, 'Notificación de Mercado Pago sin identificador de suscripción');
+    throw new HttpError(400, 'Notificacion de Mercado Pago sin identificador de suscripcion');
   }
   const mapped = mapMercadoPagoStatus(providerData.status);
   const subscription = await Subscription.findOneAndUpdate(

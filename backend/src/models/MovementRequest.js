@@ -4,6 +4,7 @@ const quantitySubSchema = require('./schemas/quantity');
 
 const movementRequestSchema = new Schema(
   {
+    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true, index: true },
     item: { type: Types.ObjectId, ref: 'Item', required: true },
     type: { type: String, enum: ['transfer', 'ingress', 'egress'], default: 'transfer' },
     fromLocation: { type: Types.ObjectId, ref: 'Location', required: true },
@@ -24,7 +25,7 @@ const movementRequestSchema = new Schema(
   }
 );
 
-movementRequestSchema.index({ status: 1, requestedAt: -1 });
+movementRequestSchema.index({ tenant: 1, status: 1, requestedAt: -1 });
 
 movementRequestSchema.pre('validate', function ensureQuantity(next) {
   this.quantity = coerceQuantity(this.quantity);

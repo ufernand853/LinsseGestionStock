@@ -70,7 +70,8 @@ router.post(
     await recordAuditEvent({
       action: 'Autenticación',
       request: 'Inicio de sesión',
-      user: user.username
+      user: user.username,
+      tenant: user.tenant?.id || user.tenant || null
     });
 
     res.json({

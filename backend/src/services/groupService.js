@@ -8,21 +8,23 @@ function toObjectId(value) {
   return new Types.ObjectId(value);
 }
 
-async function collectGroupAndDescendantIds(groupId) {
+async function collectGroupAndDescendantIds(groupId, tenantId) {
   const normalized = typeof groupId === 'string' ? groupId.trim() : '';
-  if (!normalized || !Types.ObjectId.isValid(normalized)) {
+  if (!tenantId || !normalized || !Types.ObjectId.isValid(normalized)) {
     return [];
   }
 
   const rootId = new Types.ObjectId(normalized);
+  const tenantObjectId = new Types.ObjectId(tenantId);
   const [result] = await Group.aggregate([
-    { $match: { _id: rootId } },
+    { $match: { _id: rootId, tenant: tenantObjectId } },
     {
       $graphLookup: {
         from: Group.collection.name,
         startWith: '$_id',
         connectFromField: '_id',
         connectToField: 'parent',
+        restrictSearchWithMatch: { tenant: tenantObjectId },
         as: 'descendants'
       }
     },

@@ -7,6 +7,10 @@ const { parseDateBoundary } = require('../utils/dateRange');
 
 const router = express.Router();
 
+function buildTenantFilter(req) {
+  return req.user?.tenantId ? { tenant: req.user.tenantId } : { tenant: null };
+}
+
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -16,7 +20,7 @@ router.get(
   requirePermission('stock.logs.read'),
   asyncHandler(async (req, res) => {
     const { requestId, limit = '100', action, from, to } = req.query || {};
-    const query = {};
+    const query = buildTenantFilter(req);
     if (requestId) {
       query.movementRequest = requestId;
     }
@@ -63,7 +67,7 @@ router.get(
   requirePermission('stock.logs.read'),
   asyncHandler(async (req, res) => {
     const { action, request, user, item, limit = '100', from, to } = req.query || {};
-    const query = {};
+    const query = buildTenantFilter(req);
     const normalizedAction = typeof action === 'string' ? action.trim() : '';
     const normalizedRequest = typeof request === 'string' ? request.trim() : '';
     const normalizedUser = typeof user === 'string' ? user.trim() : '';

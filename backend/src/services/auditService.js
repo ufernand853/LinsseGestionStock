@@ -17,16 +17,17 @@ function normalizeDetails(value) {
   return value;
 }
 
-async function recordAuditEvent({ action, request, user, details }) {
+async function recordAuditEvent({ tenant, action, request, user, details }) {
   const actionValue = normalizeText(action);
   const requestValue = normalizeText(request);
   const userValue = normalizeText(user, { fallback: 'Desconocido' });
 
-  if (!actionValue || !requestValue || !userValue) {
+  if (!tenant || !actionValue || !requestValue || !userValue) {
     return;
   }
 
   await AuditLog.create({
+    tenant,
     action: actionValue,
     request: requestValue,
     user: userValue,

@@ -27,10 +27,11 @@ async function removeImage(relativePath) {
 async function permanentlyDeleteItem(item, { user = 'Sistema', automatic = false } = {}) {
   const images = Array.isArray(item.images) ? item.images : [];
   await Promise.allSettled(images.map(removeImage));
-  const summary = `${automatic ? 'Eliminación automática' : 'Eliminación definitiva'} de artículo: ${item.code} - ${item.description}`;
+  const summary = `${automatic ? 'Eliminacion automatica' : 'Eliminacion definitiva'} de articulo: ${item.code} - ${item.description}`;
   await item.deleteOne();
   await recordAuditEvent({
-    action: 'Artículo',
+    tenant: item.tenant,
+    action: 'Articulo',
     request: summary,
     user,
     details: { summary, itemId: String(item._id), code: item.code, automatic }
@@ -39,6 +40,7 @@ async function permanentlyDeleteItem(item, { user = 'Sistema', automatic = false
 
 async function purgeExpiredItems() {
   const expired = await Item.find({
+    tenant: { $ne: null },
     deletedAt: { $ne: null },
     scheduledDeletionAt: { $ne: null, $lte: new Date() }
   });
