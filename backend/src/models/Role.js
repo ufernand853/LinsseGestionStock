@@ -2,7 +2,7 @@ const { Schema, model, Types } = require('mongoose');
 
 const roleSchema = new Schema(
   {
-    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true, index: true },
+    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true },
     name: { type: String, required: true, trim: true },
     permissions: { type: [String], default: [] }
   },

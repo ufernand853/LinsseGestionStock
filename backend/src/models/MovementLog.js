@@ -2,7 +2,7 @@ const { Schema, model, Types } = require('mongoose');
 
 const movementLogSchema = new Schema(
   {
-    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true, index: true },
+    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true },
     movementRequest: { type: Types.ObjectId, ref: 'MovementRequest', required: true },
     action: { type: String, required: true },
     actor: { type: Types.ObjectId, ref: 'User', required: true },

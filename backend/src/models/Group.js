@@ -2,7 +2,7 @@ const { Schema, model, Types } = require('mongoose');
 
 const groupSchema = new Schema(
   {
-    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true, index: true },
+    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true },
     name: { type: String, required: true, trim: true },
     parent: { type: Types.ObjectId, ref: 'Group', default: null }
   },

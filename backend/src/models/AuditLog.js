@@ -2,7 +2,7 @@ const { Schema, model, Types } = require('mongoose');
 
 const auditLogSchema = new Schema(
   {
-    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true, index: true },
+    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true },
     action: { type: String, required: true, trim: true },
     request: { type: String, required: true, trim: true },
     user: { type: String, required: true, trim: true },
