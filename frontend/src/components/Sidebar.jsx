@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { formatLicensePlan, formatLicensePrice } from '../utils/license.js';
+import BrandLogo from './BrandLogo.jsx';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Resumen' },
@@ -28,7 +29,9 @@ export default function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-header">Stock</div>
+      <div className="sidebar-header">
+        <BrandLogo />
+      </div>
       <nav className="sidebar-nav">
         {NAV_ITEMS.filter(item => {
           if (item.hiddenForRoles && role && item.hiddenForRoles.includes(role)) {
@@ -56,6 +59,7 @@ export default function Sidebar() {
             {licensePrice ? <span>{licensePrice}</span> : null}
           </div>
         ) : null}
+        <span className="sidebar-footer__copyright">Linsse © {new Date().getFullYear()}</span>
       </div>
     </aside>
   );

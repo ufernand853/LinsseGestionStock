@@ -1,5 +1,6 @@
 import { useAuth } from '../context/AuthContext.jsx';
 import { formatLicensePlan } from '../utils/license.js';
+import BrandLogo from './BrandLogo.jsx';
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -7,7 +8,9 @@ export default function Header() {
 
   return (
     <header className="app-header">
-      <h1>Stock</h1>
+      <div className="app-header__brand">
+        <BrandLogo compact />
+      </div>
       <div className="header-user">
         {user ? (
           <>
