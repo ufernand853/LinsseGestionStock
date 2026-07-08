@@ -21,6 +21,30 @@ const planVisuals = {
   }
 };
 
+
+const commercialFeatures = [
+  {
+    icon: '📦',
+    title: 'Productos siempre ordenados',
+    text: 'Controlá códigos, unidades, grupos y estados para saber exactamente qué tenés disponible.'
+  },
+  {
+    icon: '📍',
+    title: 'Ubicaciones claras',
+    text: 'Organizá depósitos, sucursales, estanterías o zonas para encontrar la mercadería más rápido.'
+  },
+  {
+    icon: '👥',
+    title: 'Usuarios y permisos',
+    text: 'Asigná roles a tu equipo y protegé la operación con accesos separados por responsabilidad.'
+  },
+  {
+    icon: '📊',
+    title: 'Reportes y alertas',
+    text: 'Tomá decisiones con información de movimientos, stock bajo, sobrestock y actividad de inventario.'
+  }
+];
+
 const selfServicePlanCodes = ['BASIC', 'PRO'];
 const whatsappContactUrl = 'https://wa.me/59898682749?text=Hola%2C%20tengo%20una%20consulta%20sobre%20los%20planes%20de%20Linsse%20Stock';
 
@@ -96,6 +120,23 @@ export default function PricingPage() {
             <WhatsAppIcon />
             <span>Contactar por WhatsApp</span>
           </a>
+        </div>
+      </section>
+
+      <section className="pricing-features section-card" aria-label="Funcionalidades principales antes de elegir un plan">
+        <div className="pricing-features__intro">
+          <span className="public-eyebrow">Antes de elegir un plan</span>
+          <h2>Todo lo que necesitás para profesionalizar la gestión de stock</h2>
+          <p>Una vista comercial rápida de las funciones principales que vas a usar para ordenar tu operación, reducir errores y crecer con más control.</p>
+        </div>
+        <div className="pricing-features__grid">
+          {commercialFeatures.map(feature => (
+            <article className="pricing-feature-card" key={feature.title}>
+              <span aria-hidden="true">{feature.icon}</span>
+              <h3>{feature.title}</h3>
+              <p>{feature.text}</p>
+            </article>
+          ))}
         </div>
       </section>
       {loading ? <div className="section-card">Cargando planes...</div> : null}
