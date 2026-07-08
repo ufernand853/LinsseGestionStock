@@ -2,7 +2,7 @@ const { Schema, model, Types } = require('mongoose');
 
 const dashboardConfigSchema = new Schema(
   {
-    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true, index: true },
+    tenant: { type: Types.ObjectId, ref: 'Tenant', required: true },
     manualAttentionIds: [{ type: Schema.Types.ObjectId, ref: 'Item' }],
     recountThresholdDays: { type: Number, default: 0 },
     updatedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null }
