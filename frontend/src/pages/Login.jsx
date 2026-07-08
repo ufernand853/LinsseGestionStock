@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import BrandLogo from '../components/BrandLogo.jsx';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -29,12 +30,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="page-loading" style={{ flexDirection: 'column', gap: '1.5rem' }}>
-      <div className="section-card" style={{ width: 'min(420px, 90vw)' }}>
-        <h2>Ingreso al sistema</h2>
-        <p style={{ color: '#475569', fontSize: '0.95rem' }}>
-          Utilice sus credenciales corporativas para acceder al panel de gestión de stock.
-        </p>
+    <main className="auth-page">
+      <section className="auth-card section-card">
+        <BrandLogo className="brand-logo--centered" />
+        <div className="auth-card__heading">
+          <span className="public-eyebrow">Acceso seguro</span>
+          <h1>Ingreso al sistema</h1>
+          <p>Utilizá tus credenciales corporativas para acceder al panel de gestión de stock.</p>
+        </div>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit} className="form-grid" style={{ gridTemplateColumns: '1fr' }}>
           <div className="input-group">
@@ -62,10 +65,10 @@ export default function LoginPage() {
             {loading ? 'Ingresando...' : 'Ingresar'}
           </button>
         </form>
-        <p style={{ marginTop: '1rem', color: '#64748b' }}>
-          ¿No tenés cuenta? <Link to="/planes" style={{ color: '#2563eb', fontWeight: 700 }}>Ver planes</Link>
+        <p className="auth-card__footer">
+          ¿No tenés cuenta? <Link to="/planes">Ver planes</Link>
         </p>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
