@@ -1499,3 +1499,140 @@ th {
     grid-template-columns: 1fr;
   }
 }
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: fit-content;
+  color: #0f172a;
+}
+
+.brand-logo__mark {
+  display: inline-grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: #4b8cad;
+  box-shadow: 0 18px 38px -24px rgba(15, 23, 42, 0.8);
+  overflow: hidden;
+}
+
+.brand-logo__mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.brand-logo__mark rect {
+  fill: #4b8cad;
+}
+
+.brand-logo__mark path {
+  fill: #fff;
+}
+
+.brand-logo__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+  line-height: 1.05;
+}
+
+.brand-logo__copy strong {
+  font-size: 1.38rem;
+  letter-spacing: -0.04em;
+}
+
+.brand-logo__copy small {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.brand-logo--centered {
+  align-self: center;
+  text-align: left;
+}
+
+.public-hero--branded,
+.features-hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.public-hero--branded {
+  gap: 0.2rem;
+}
+
+.features-hero__content {
+  gap: 0.15rem;
+}
+
+.auth-page {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(75, 140, 173, 0.18), transparent 26rem),
+    radial-gradient(circle at 82% 16%, rgba(37, 99, 235, 0.12), transparent 24rem),
+    linear-gradient(180deg, #f8fafc 0%, #eef6fb 100%);
+}
+
+.auth-card {
+  width: min(450px, 92vw);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  border-color: #dbeafe;
+  box-shadow: 0 24px 65px -40px rgba(15, 23, 42, 0.75);
+}
+
+.auth-card__heading {
+  text-align: center;
+}
+
+.auth-card__heading h1 {
+  margin: 0.35rem 0 0.65rem;
+  font-size: clamp(1.8rem, 4vw, 2.45rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.auth-card__heading p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.96rem;
+}
+
+.auth-card__footer {
+  margin: 0.2rem 0 0;
+  color: #64748b;
+  text-align: center;
+}
+
+.auth-card__footer a {
+  color: #2563eb;
+  font-weight: 800;
+}
+
+@media (max-width: 560px) {
+  .brand-logo__mark {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+  }
+
+  .brand-logo__copy strong {
+    font-size: 1.18rem;
+  }
+
+  .brand-logo__copy small {
+    font-size: 0.68rem;
+  }
+}

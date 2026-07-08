@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import BrandLogo from '../../components/BrandLogo.jsx';
 
 const features = [
   {
@@ -45,6 +46,7 @@ export default function FeaturesPage() {
     <main className="public-page public-page--commercial">
       <section className="features-hero">
         <div className="features-hero__content">
+          <BrandLogo />
           <span className="public-eyebrow">Características de Linsse Stock</span>
           <h1>Gestioná tu inventario con una plataforma pensada para vender más y perder menos.</h1>
           <p>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { publicApi } from '../../utils/publicApi.js';
 import { formatPlanLimit, formatPlanPrice } from '../../utils/license.js';
+import BrandLogo from '../../components/BrandLogo.jsx';
 
 const planVisuals = {
   BASIC: {
@@ -109,7 +110,8 @@ export default function PricingPage() {
 
   return (
     <main className="public-page">
-      <section className="public-hero">
+      <section className="public-hero public-hero--branded">
+        <BrandLogo />
         <span className="public-eyebrow">SaaS de stock</span>
         <h1>Elegí el plan para tu empresa</h1>
         <p>Registrá tu cuenta y empezá a gestionar productos, ubicaciones, usuarios y mucho más.</p>
