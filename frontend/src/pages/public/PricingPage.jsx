@@ -112,7 +112,7 @@ export default function PricingPage() {
       <section className="public-hero">
         <span className="public-eyebrow">SaaS de stock</span>
         <h1>Elegí el plan para tu empresa</h1>
-        <p>Registrá tu cuenta, pagá con Mercado Pago Uruguay y empezá a gestionar productos, ubicaciones, usuarios y mucho más.</p>
+        <p>Registrá tu cuenta y empezá a gestionar productos, ubicaciones, usuarios y mucho más.</p>
         <div className="public-hero-actions">
           <Link to="/funcionalidades" className="secondary-link">Ver funcionalidades</Link>
           <Link to="/login" className="secondary-link">Ya tengo cuenta</Link>
