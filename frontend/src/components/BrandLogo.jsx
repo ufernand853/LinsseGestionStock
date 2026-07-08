@@ -6,8 +6,8 @@ export default function BrandLogo({ className = '', tagline = 'Gestión intelige
       <span className="brand-logo__mark" aria-hidden="true">
         <svg viewBox="0 0 96 96" focusable="false" role="img">
           <rect width="96" height="96" rx="22" />
-          <path d="M18 18v60l42-24c5.5-3.1 12.4-7.9 12.4-10S65.5 37.1 60 34L18 10v8Z" />
-          <path d="M37 67.5 78 43.7c1.9-1.1 3.8.2 3.9 2.4l.4 31.1c0 1.8-.9 3.4-2.4 4.3L50.1 98.7 21.6 80.6c-1.8-1.1-1.9-3.8-.2-5.1L37 67.5Z" />
+          <path d="M24 20v56l39-22.4c4.1-2.4 7.8-5.2 7.8-6.1s-3.7-3.7-7.8-6.1L24 19.1V20Z" />
+          <path d="M42 63.4 78.5 42c1.8-1.1 4.1.2 4.2 2.3l.4 30.1c0 1.7-.9 3.3-2.3 4.2L48 88 24.3 73.3c-1.9-1.2-1.9-4 .1-5.1L42 63.4Z" />
         </svg>
       </span>
       <span className="brand-logo__copy">
