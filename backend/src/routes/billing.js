@@ -9,10 +9,13 @@ const { serializePlan } = require('../services/licenseSerializer');
 
 const router = express.Router();
 
-function requireAdmin(req, res, next) {
+const PLAN_MANAGER_EMAIL = 'admin@linsse.com';
+
+function requirePlanManager(req, res, next) {
   requireAuth(req, res, () => {
-    if (req.user?.role !== 'Administrador') {
-      throw new HttpError(403, 'Solo un administrador puede gestionar planes');
+    const userEmail = String(req.user?.email || '').trim().toLowerCase();
+    if (userEmail !== PLAN_MANAGER_EMAIL) {
+      throw new HttpError(403, 'Solo admin@linsse.com puede gestionar planes');
     }
     next();
   });
@@ -34,7 +37,7 @@ function normalizeNullableNumber(value, fieldName, { integer = false, min = 0 } 
 
 router.get(
   '/plans',
-  requireAdmin,
+  requirePlanManager,
   asyncHandler(async (req, res) => {
     const plans = await SubscriptionPlan.find({}).sort({ priceAmount: 1, productLimit: 1, code: 1 });
     res.json(plans.map(serializePlan));
@@ -43,7 +46,7 @@ router.get(
 
 router.put(
   '/plans/:code',
-  requireAdmin,
+  requirePlanManager,
   asyncHandler(async (req, res) => {
     const normalizedCode = String(req.params.code || '').trim().toUpperCase();
     const plan = await SubscriptionPlan.findOne({ code: normalizedCode });
