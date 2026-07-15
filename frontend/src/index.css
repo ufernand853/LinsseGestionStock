@@ -1819,3 +1819,44 @@ th {
     letter-spacing: 0.08em;
   }
 }
+
+.plans-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.plans-admin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.plans-admin-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.plans-admin-card__header h3 {
+  margin: 0.2rem 0 0;
+  font-size: 1.25rem;
+}
+
+.plans-admin-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-grid--compact {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.plans-admin-active-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #334155;
+  font-weight: 700;
+}
