@@ -21,6 +21,7 @@ import FeaturesPage from './pages/public/FeaturesPage.jsx';
 import RegisterTenantPage from './pages/public/RegisterTenantPage.jsx';
 import PaymentResultPage from './pages/public/PaymentResultPage.jsx';
 import LicensePage from './pages/billing/LicensePage.jsx';
+import PlansAdminPage from './pages/billing/PlansAdminPage.jsx';
 
 export default function App() {
   return (
@@ -53,6 +54,7 @@ export default function App() {
         <Route path="audit" element={<AuditLogsPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="licencia" element={<LicensePage />} />
+        <Route path="admin/planes" element={<PlansAdminPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

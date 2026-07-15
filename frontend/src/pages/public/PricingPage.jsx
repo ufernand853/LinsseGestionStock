@@ -47,6 +47,10 @@ const commercialFeatures = [
 ];
 
 const selfServicePlanCodes = ['BASIC', 'PRO'];
+const enterpriseHighlights = [
+  'Integración con plataformas de e-commerce',
+  'Acompañamiento para adaptar flujos a medida'
+];
 const whatsappContactUrl = 'https://wa.me/59898682749?text=Hola%2C%20tengo%20una%20consulta%20sobre%20los%20planes%20de%20Linsse%20Stock';
 
 function WhatsAppIcon() {
@@ -173,6 +177,11 @@ export default function PricingPage() {
               <strong className="pricing-price">{formatPlanPrice(enterprisePlan)}</strong>
               <p>{enterprisePlan.description}</p>
               <span className="pricing-limit">{formatPlanLimit(enterprisePlan)}</span>
+              <ul className="pricing-enterprise-highlights" aria-label="Beneficios del plan a medida">
+                {enterpriseHighlights.map(highlight => (
+                  <li key={highlight}>{highlight}</li>
+                ))}
+              </ul>
             </div>
             <form className="enterprise-contact-form" onSubmit={handleEnterpriseContactSubmit}>
               <div>
