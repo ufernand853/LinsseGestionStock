@@ -16,7 +16,8 @@ const NAV_ITEMS = [
   { to: '/reports', label: 'Reportes', permission: 'reports.read', hiddenForRoles: ['Operador'] },
   { to: '/audit', label: 'Auditoría', permission: 'stock.logs.read', hiddenForRoles: ['Operador'] },
   { to: '/users', label: 'Usuarios', permission: 'users.read', hiddenForRoles: ['Operador'] },
-  { to: '/licencia', label: 'Mi licencia' }
+  { to: '/licencia', label: 'Mi licencia' },
+  { to: '/admin/planes', label: 'Planes', allowedEmails: ['admin@linsse.com'] }
 ];
 
 export default function Sidebar() {
@@ -31,6 +32,9 @@ export default function Sidebar() {
       <div className="sidebar-header">Stock</div>
       <nav className="sidebar-nav">
         {NAV_ITEMS.filter(item => {
+          if (item.allowedEmails && !item.allowedEmails.includes(String(user?.email || '').toLowerCase())) {
+            return false;
+          }
           if (item.hiddenForRoles && role && item.hiddenForRoles.includes(role)) {
             return false;
           }

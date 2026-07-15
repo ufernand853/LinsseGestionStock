@@ -57,9 +57,45 @@ export default function FeaturesPage() {
             <Link to="/registro" className="secondary-link">Crear cuenta</Link>
           </div>
         </div>
-        <aside className="features-hero__panel" aria-label="Resumen comercial">
-          <strong>Operación más simple</strong>
-          <span>Stock, usuarios y ubicaciones en un único panel.</span>
+        <aside className="features-hero__panel" aria-label="Vista previa del panel de stock">
+          <div className="features-hero__panel-copy">
+            <strong>Operación más simple</strong>
+            <span>Stock, usuarios y ubicaciones en un único panel.</span>
+          </div>
+
+          <div className="features-dashboard-preview" aria-hidden="true">
+            <div className="features-dashboard-preview__sidebar">
+              <b>Stock</b>
+              <i />
+              <i />
+              <i />
+            </div>
+            <div className="features-dashboard-preview__content">
+              <div className="features-dashboard-preview__bar">
+                <b>Stock</b>
+                <span />
+              </div>
+              <div className="features-dashboard-preview__heading">
+                <strong>Resumen operativo</strong>
+                <small>Indicadores clave del inventario.</small>
+              </div>
+              <div className="features-dashboard-preview__stats">
+                <span><b>1694</b><small>cajas</small></span>
+                <span><b>5</b><small>depósitos</small></span>
+                <span><b>0</b><small>pendientes</small></span>
+              </div>
+              <div className="features-dashboard-preview__alerts">
+                <span>Recuento pendiente</span>
+                <span>Artículos agotados</span>
+              </div>
+              <div className="features-dashboard-preview__table">
+                <b />
+                <i />
+                <i />
+              </div>
+            </div>
+          </div>
+
           <div className="features-hero__metric">
             <b>24/7</b>
             <small>Acceso web para consultar tu inventario cuando lo necesites.</small>
