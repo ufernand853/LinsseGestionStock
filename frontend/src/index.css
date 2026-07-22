@@ -1770,8 +1770,116 @@ th {
     linear-gradient(180deg, #f8fafc 0%, #eef6fb 100%);
 }
 
+
+.auth-shell {
+  width: min(1120px, 94vw);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+  align-items: stretch;
+  gap: clamp(1rem, 3vw, 2rem);
+}
+
+.auth-value-panel {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.35rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  color: #eff6ff;
+  border: 1px solid rgba(191, 219, 254, 0.22);
+  border-radius: 28px;
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 64, 175, 0.9)),
+    radial-gradient(circle at 10% 10%, rgba(125, 211, 252, 0.28), transparent 18rem);
+  box-shadow: 0 35px 90px -56px rgba(15, 23, 42, 0.95);
+}
+
+.auth-value-panel::after {
+  content: '';
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: -70px;
+  bottom: -70px;
+  border-radius: 999px;
+  background: rgba(96, 165, 250, 0.2);
+}
+
+.auth-value-panel__eyebrow {
+  color: #93c5fd;
+}
+
+.auth-value-panel h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  max-width: 640px;
+  font-size: clamp(2rem, 4vw, 3.8rem);
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.auth-value-panel__lead {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  max-width: 620px;
+  color: #dbeafe;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+}
+
+.auth-value-panel__highlights {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.auth-highlight {
+  padding: 1rem;
+  border: 1px solid rgba(219, 234, 254, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.auth-highlight span {
+  color: #bfdbfe;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auth-highlight h3 {
+  margin: 0.2rem 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.auth-highlight p {
+  margin: 0;
+  color: #dbeafe;
+  font-size: 0.92rem;
+}
+
+.auth-value-panel__cta {
+  position: relative;
+  z-index: 1;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  background: rgba(37, 99, 235, 0.28);
+  color: #eff6ff;
+}
+
+.auth-value-panel__cta strong {
+  color: #fff;
+}
+
 .auth-card {
-  width: min(460px, 92vw);
+  width: min(460px, 100%);
+  justify-self: center;
   display: flex;
   flex-direction: column;
   gap: 1.35rem;
@@ -1807,6 +1915,17 @@ th {
 .auth-card__footer a {
   color: #2563eb;
   font-weight: 800;
+}
+
+
+@media (max-width: 900px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-value-panel {
+    min-height: auto;
+  }
 }
 
 @media (max-width: 560px) {
