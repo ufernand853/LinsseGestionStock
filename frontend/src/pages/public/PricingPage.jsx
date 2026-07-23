@@ -7,7 +7,7 @@ import BrandLogo from '../../components/BrandLogo.jsx';
 const planVisuals = {
   BASIC: {
     icon: '📦',
-    label: 'Gestión simple para comercios pequeños',
+    label: 'Gestión simple para pequeñas empresas',
     className: 'pricing-card-visual--basic'
   },
   PRO: {
@@ -49,7 +49,8 @@ const commercialFeatures = [
 const selfServicePlanCodes = ['BASIC', 'PRO'];
 const enterpriseHighlights = [
   'Integración con plataformas de e-commerce',
-  'Acompañamiento para adaptar flujos a medida'
+  'Acompañamiento para adaptar flujos a medida',
+  'Integración con IA'
 ];
 const whatsappContactUrl = 'https://wa.me/59898682749?text=Hola%2C%20tengo%20una%20consulta%20sobre%20los%20planes%20de%20Linsse%20Stock';
 

@@ -14,7 +14,7 @@ const DashboardConfig = require('./models/DashboardConfig');
 const { ensureTenantSeedData } = require('./services/tenantProvisioningService');
 
 const defaultPlans = [
-  { code: 'BASIC', name: 'Basico', priceUsdMonthly: 10, priceAmount: 390, currency: 'UYU', productLimit: 100, description: 'Para pequenos comercios', ctaLabel: 'Contratar' },
+  { code: 'BASIC', name: 'Basico', priceUsdMonthly: 10, priceAmount: 390, currency: 'UYU', productLimit: 100, description: 'Para Pequeñas Empresas', ctaLabel: 'Contratar' },
   { code: 'PRO', name: 'Pro', priceUsdMonthly: 50, priceAmount: 1990, currency: 'UYU', productLimit: 500, description: 'Hasta 500 productos', ctaLabel: 'Contratar' },
   { code: 'ENTERPRISE', name: 'Empresa', priceUsdMonthly: null, priceAmount: null, currency: 'UYU', productLimit: null, description: 'Sin limites, integraciones y varias sucursales', ctaLabel: 'Solicitar demo' }
 ];
