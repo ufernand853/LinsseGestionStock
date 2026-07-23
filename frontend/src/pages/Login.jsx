@@ -60,7 +60,7 @@ export default function LoginPage() {
           <span className="public-eyebrow">Suscribite y ordená tu stock hoy</span>
           <h1 id="auth-commercial-title">Bajo costo, mucha funcionalidad y soporte remoto para vender más con stock bajo control.</h1>
           <p>
-            Linsse Stock está pensado para comercios y empresas que quieren profesionalizar su inventario sin gastar de más: empezás rápido, recibís asistencia remota y podés escalar al Plan Pro con integración de IA para tomar mejores decisiones comerciales.
+            Linsse Stock está pensado para pequeñas empresas que quieren profesionalizar su inventario sin gastar de más: empezás rápido, recibís asistencia remota y podés escalar al Plan Pro con integración de IA para tomar mejores decisiones comerciales.
           </p>
           <div className="auth-commercial-features">
             {commercialFeatures.map(feature => (

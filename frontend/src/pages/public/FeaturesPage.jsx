@@ -38,7 +38,7 @@ const benefits = [
   'Menos pérdidas por errores manuales o falta de seguimiento.',
   'Más velocidad para recibir, mover y consultar mercadería.',
   'Información ordenada para tomar decisiones comerciales.',
-  'Escalable desde un comercio pequeño hasta operaciones con varias ubicaciones.'
+  'Escalable desde pequeñas empresas hasta operaciones con varias ubicaciones.'
 ];
 
 export default function FeaturesPage() {
