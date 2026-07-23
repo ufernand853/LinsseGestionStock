@@ -1860,3 +1860,106 @@ th {
   color: #334155;
   font-weight: 700;
 }
+
+.auth-commercial-shell {
+  width: min(1120px, 94vw);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: stretch;
+}
+
+.auth-commercial-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px solid rgba(191, 219, 254, 0.8);
+  border-radius: 28px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(239, 246, 255, 0.78)),
+    #fff;
+  box-shadow: 0 30px 90px -58px rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+}
+
+.auth-commercial-panel h1 {
+  max-width: 720px;
+  margin: 0;
+  font-size: clamp(2.1rem, 5vw, 4.35rem);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+}
+
+.auth-commercial-panel > p {
+  max-width: 680px;
+  margin: 0;
+  color: #475569;
+  font-size: 1.05rem;
+}
+
+.auth-commercial-features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 0.35rem;
+}
+
+.auth-commercial-feature {
+  padding: 1rem;
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 18px 45px -38px rgba(15, 23, 42, 0.7);
+}
+
+.auth-commercial-feature span {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: #eff6ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.auth-commercial-feature h2 {
+  margin: 0 0 0.45rem;
+  color: #0f172a;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.auth-commercial-feature p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.auth-commercial-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 980px) {
+  .auth-commercial-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .auth-commercial-features {
+    grid-template-columns: 1fr;
+  }
+}
