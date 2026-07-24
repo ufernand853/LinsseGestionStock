@@ -374,10 +374,26 @@ Si querés registrar la cuenta SaaS con un email real pero pagar con el comprado
    MERCADOPAGO_PAYER_EMAIL_OVERRIDE=email-del-comprador-test@example.com
    ```
 
-Reiniciá el backend después de cambiar credenciales o variables de Mercado Pago:
+Reiniciá el backend después de cambiar credenciales o variables de Mercado Pago. Si el proceso ya fue creado con el
+nombre recomendado en esta guía, usá:
 
    ```bash
-   pm2 restart LinsseGestionStock --update-env
+   sudo -u adminuser PM2_HOME=/home/adminuser/.pm2 pm2 restart gestionthibe --update-env
+   ```
+
+Si PM2 responde `Process or Namespace ... not found`, ese nombre no existe todavía o fue creado con otro nombre.
+Verificá el nombre real con:
+
+   ```bash
+   sudo -u adminuser PM2_HOME=/home/adminuser/.pm2 pm2 list
+   ```
+
+Si no aparece ningún proceso para la API, crealo desde el directorio `backend/`:
+
+   ```bash
+   cd /home/adminuser/LinsseGestionStock/backend
+   sudo -u adminuser PM2_HOME=/home/adminuser/.pm2 pm2 start src/index.js --name gestionthibe --update-env
+   sudo -u adminuser PM2_HOME=/home/adminuser/.pm2 pm2 save
    ```
 
 Generá una suscripción nueva; los links de checkout creados antes del cambio mantienen la configuración anterior.
