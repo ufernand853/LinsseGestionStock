@@ -544,13 +544,50 @@ export default function DashboardPage() {
     card => !(isRestrictedSummaryRole && card.hideForOperator)
   );
 
+  const locationChartItems = stockByLocation.slice(0, 6).map(entry => {
+    const total = ensureQuantity(entry.total);
+    return {
+      id: entry.id,
+      name: entry.name || 'Ubicación',
+      value: total.boxes * 1000 + total.units,
+      label: formatQuantity(entry.total)
+    };
+  });
+  const maxLocationChartValue = Math.max(...locationChartItems.map(item => item.value), 1);
+  const maxTopWithdrawalsValue = Math.max(...topItems.map(item => item.total.boxes * 1000 + item.total.units), 1);
+
   return (
     <div className="dashboard-page">
-      <h2>Resumen operativo</h2>
-      <p style={{ color: '#475569', marginTop: '-0.5rem' }}>
-        Visualice los indicadores clave del inventario, los recordatorios de conteo y las ubicaciones involucradas en las
-        transferencias.
-      </p>
+      <section className="dashboard-hero">
+        <div className="dashboard-hero__copy">
+          <span className="dashboard-kicker">Gestión inteligente de stock</span>
+          <h2>Gestioná tu inventario con más control y menos esfuerzo</h2>
+          <p>
+            Productos, ubicaciones, usuarios, movimientos, reportes y alertas en una sola plataforma.
+          </p>
+        </div>
+        <div className="dashboard-preview" aria-label="Vista previa con gráficas del inventario">
+          <div className="dashboard-preview__bar">
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="dashboard-preview__panel">
+            <div className="dashboard-preview__chart">
+              <span style={{ height: '34%' }} />
+              <span style={{ height: '48%' }} />
+              <span style={{ height: '42%' }} />
+              <span style={{ height: '68%' }} />
+              <span style={{ height: '58%' }} />
+              <span style={{ height: '82%' }} />
+            </div>
+            <div className="dashboard-preview__cards">
+              <strong>{formatQuantity(metrics.totalStock)}</strong>
+              <span>Stock consolidado</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {error && <ErrorMessage error={error} />}
 
@@ -565,6 +602,49 @@ export default function DashboardPage() {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {!isRestrictedSummaryRole && (locationChartItems.length > 0 || topItems.length > 0) && (
+        <div className="dashboard-charts-grid">
+          {locationChartItems.length > 0 && (
+            <section className="section-card dashboard-chart-card">
+              <div className="flex-between">
+                <div>
+                  <h2>Stock por ubicación</h2>
+                  <span className="dashboard-card-subtitle">Distribución visual del inventario</span>
+                </div>
+              </div>
+              <div className="bar-chart">
+                {locationChartItems.map(item => (
+                  <div key={item.id} className="bar-chart__row">
+                    <span className="bar-chart__label">{item.name}</span>
+                    <div className="bar-chart__track">
+                      <span style={{ width: `${Math.max((item.value / maxLocationChartValue) * 100, 8)}%` }} />
+                    </div>
+                    <strong>{item.label}</strong>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+          {topItems.length > 0 && (
+            <section className="section-card dashboard-chart-card dashboard-chart-card--blue">
+              <h2>Retiros destacados</h2>
+              <span className="dashboard-card-subtitle">Top 5 del período seleccionado</span>
+              <div className="column-chart">
+                {topItems.map(item => {
+                  const value = item.total.boxes * 1000 + item.total.units;
+                  return (
+                    <div key={item.id} className="column-chart__item">
+                      <span style={{ height: `${Math.max((value / maxTopWithdrawalsValue) * 100, 12)}%` }} />
+                      <small>{item.code}</small>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </div>
       )}
 
