@@ -151,8 +151,12 @@ export default function DashboardPage() {
           collectedItems,
           attentionConfigResponse
         ] = await Promise.all([
-          shouldLoadStockSummary ? api.get('/reports/stock/by-location') : Promise.resolve([]),
-          shouldLoadLocations ? api.get('/locations') : Promise.resolve([]),
+          shouldLoadStockSummary
+            ? api.get('/reports/stock/by-location', { query: { status: 'active' } })
+            : Promise.resolve([]),
+          shouldLoadLocations
+            ? api.get('/locations', { query: { status: 'active' } })
+            : Promise.resolve([]),
           shouldLoadRequests ? api.get('/stock/requests') : Promise.resolve([]),
           fetchAllItems(),
           attentionConfigPromise
