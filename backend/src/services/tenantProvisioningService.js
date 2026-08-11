@@ -46,8 +46,6 @@ const defaultGroups = [
   'JUGUETES',
   'ESCOLARES',
   'SOBRESTOCK GENERAL',
-  'SOBRESTOCK THIBE',
-  'SOBRESTOCK ARENAL IMPORT',
   'CLIENTES'
 ];
 

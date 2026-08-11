@@ -167,10 +167,20 @@ async function respondStockByLocation(req, res) {
   const includeItems =
     typeof req.query.includeItems === 'string' && req.query.includeItems.toLowerCase() === 'true';
   const requestedLocationId = typeof req.query.locationId === 'string' ? req.query.locationId : null;
+  const requestedStatus = typeof req.query.status === 'string' ? req.query.status.trim() : null;
+  if (requestedStatus && !['active', 'inactive'].includes(requestedStatus)) {
+    res.status(400).json({ message: 'Estado de ubicación inválido' });
+    return;
+  }
+
+  const locationFilters = { ...buildTenantFilter(req), type: 'warehouse' };
+  if (requestedStatus) {
+    locationFilters.status = requestedStatus;
+  }
 
   const [items, locations] = await Promise.all([
     Item.find({ ...buildTenantFilter(req), deletedAt: null }),
-    Location.find({ ...buildTenantFilter(req), type: 'warehouse' })
+    Location.find(locationFilters)
   ]);
   const locationsById = new Map(
     locations.map(location => [
