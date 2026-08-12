@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { API_BASE_URL } from '../utils/apiConfig.js';
-const STORAGE_KEY = 'gestionthibe:auth';
+const STORAGE_KEY = 'linsse-stock:auth';
 
 const AuthContext = createContext(null);
 
