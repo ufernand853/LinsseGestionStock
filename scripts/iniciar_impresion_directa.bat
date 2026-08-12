@@ -15,5 +15,5 @@ if not exist "%BROWSER%" (
   exit /b 1
 )
 
-start "GestionThibe - impresion directa" "%BROWSER%" --user-data-dir="%TEMP%\GestionThibePrintProfile" --no-first-run --app="%APP_URL%" --kiosk-printing
+start "Linsse Stock - impresion directa" "%BROWSER%" --user-data-dir="%TEMP%\LinsseStockPrintProfile" --no-first-run --app="%APP_URL%" --kiosk-printing
 endlocal
