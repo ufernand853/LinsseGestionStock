@@ -14,7 +14,7 @@ El asistente validará que Node.js (y Docker, si eliges esa opción) estén disp
 
 - Backend en `http://localhost:3000`
 - Frontend en `http://localhost:4173`
-- MongoDB en un contenedor Docker (`gestionthibe-mongo`) apuntado por la URI `mongodb://admin:admin123@localhost:27017/gestionthibe?authSource=admin`
+- MongoDB en un contenedor Docker (`linsse-stock-mongo`) apuntado por la URI `mongodb://admin:admin123@localhost:27017/linsse_stock?authSource=admin`
 
 ### Parámetros útiles
 
@@ -70,32 +70,32 @@ Al ejecutar `python scripts/demo_deployer.py --mongo-mode install` el asistente 
 - En macOS utiliza Homebrew (`brew tap mongodb/brew && brew install mongodb-community@6.0`).
 - En Windows intenta instalar `MongoDB Server` con Chocolatey o Winget y arranca el servicio `MongoDB`.
 
-La URI configurada en el backend será `mongodb://localhost:27017/gestionthibe` (sin autenticación por defecto). Si tu entorno requiere credenciales adicionales, ejecuta el script con `--mongo-uri` después de la instalación automática.
+La URI configurada en el backend será `mongodb://localhost:27017/linsse_stock` (sin autenticación por defecto). Si tu entorno requiere credenciales adicionales, ejecuta el script con `--mongo-uri` después de la instalación automática.
 
 ### Opción B: Usar un contenedor Docker (recomendado para demos)
 
 ```bash
-docker run --name gestionthibe-mongo \
+docker run --name linsse-stock-mongo \
   -p 27017:27017 \
   -e MONGO_INITDB_ROOT_USERNAME=admin \
   -e MONGO_INITDB_ROOT_PASSWORD=admin123 \
   -d mongo:6
 ```
 
-- El backend se conectará a `mongodb://admin:admin123@localhost:27017/gestionthibe?authSource=admin`.
+- El backend se conectará a `mongodb://admin:admin123@localhost:27017/linsse_stock?authSource=admin`.
 - Si Docker no está instalado, usa la opción A (`--mongo-mode install`) o prepara una instancia existente (opción C).
 
 ### Opción C: Usar una instalación existente de MongoDB
 
 1. Instala MongoDB Community Edition o usa un clúster de MongoDB Atlas.
 2. Asegúrate de que el puerto 27017 esté accesible desde la máquina donde correrá el backend.
-3. Crea un usuario con permisos de lectura/escritura sobre la base que utilizará la demo (`gestionthibe`).
+3. Crea un usuario con permisos de lectura/escritura sobre la base que utilizará la demo (`linsse_stock`).
 
 ## 3. Clonar el repositorio
 
 ```bash
-git clone https://github.com/<ORGANIZACION>/GestionThibe.git
-cd GestionThibe
+git clone https://github.com/<ORGANIZACION>/LinsseGestionStock.git
+cd LinsseGestionStock
 ```
 
 Si ya tienes una copia, actualízala con `git pull`.
@@ -114,7 +114,7 @@ Si ya tienes una copia, actualízala con `git pull`.
 
    ```ini
    PORT=3000
-   MONGO_URI=mongodb://admin:admin123@localhost:27017/gestionthibe?authSource=admin
+   MONGO_URI=mongodb://admin:admin123@localhost:27017/linsse_stock?authSource=admin
    JWT_SECRET=cambia-este-valor
    ACCESS_TOKEN_TTL=3600
    REFRESH_TOKEN_TTL=604800
@@ -133,7 +133,7 @@ Si ya tienes una copia, actualízala con `git pull`.
 
    El servidor escuchará en `http://localhost:3000` (o el puerto indicado en `.env`).
 
-4. (Opcional) Ejecuta el backend en segundo plano con `npx pm2 start src/index.js --name gestionthibe`.
+4. (Opcional) Ejecuta el backend en segundo plano con `npx pm2 start src/index.js --name linsse_stock`.
 
 ## 5. Configurar el frontend
 
@@ -174,6 +174,6 @@ Si ya tienes una copia, actualízala con `git pull`.
 - **El backend no arranca**: revisa la cadena `MONGO_URI` y que MongoDB esté en ejecución (`docker ps` o `systemctl status mongod`).
 - **Error de CORS**: confirma que `VITE_API_BASE_URL` usa la misma URL y puerto en la que está publicado el backend.
 - **No puedo iniciar sesión**: verifica que el backend pudo ejecutar la inicialización de roles/usuarios en los logs al arrancar.
-- **Quiero reiniciar la base para otra demo**: borra la base `gestionthibe` (`use gestionthibe; db.dropDatabase();`) o elimina el contenedor `docker rm -f gestionthibe-mongo` y créalo otra vez.
+- **Quiero reiniciar la base para otra demo**: borra la base `linsse_stock` (`use linsse_stock; db.dropDatabase();`) o elimina el contenedor `docker rm -f linsse-stock-mongo` y créalo otra vez.
 
 Con estos pasos tendrás la solución lista para presentar en otra máquina sin depender de tu entorno de desarrollo original.

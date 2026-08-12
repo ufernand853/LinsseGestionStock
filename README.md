@@ -35,7 +35,7 @@ npm install
 npm start
 ```
 
-Por defecto el servidor se levanta en `http://localhost:3000` y se conecta a `mongodb://localhost:27017/gestionthibe`.
+Por defecto el servidor se levanta en `http://localhost:3000` y se conecta a `mongodb://localhost:27017/linsse_stock`.
 
 #### Ejecutar el backend como servicio con PM2
 
@@ -59,22 +59,22 @@ sudo npm install -g pm2
 Luego inicia la API con un nombre identificable y habilita el monitoreo básico:
 
 ```bash
-pm2 start src/index.js --name gestionthibe
+pm2 start src/index.js --name linsse_stock
 pm2 status
-pm2 logs gestionthibe
+pm2 logs linsse_stock
 ```
 
 Para detener o reanudar la instancia administrada por PM2 sin perder la configuración guardada:
 
 ```bash
-pm2 stop gestionthibe     # Detiene el servicio
-pm2 restart gestionthibe  # Lo vuelve a iniciar cuando necesites
+pm2 stop linsse_stock     # Detiene el servicio
+pm2 restart linsse_stock  # Lo vuelve a iniciar cuando necesites
 ```
 
 Si deseás dar de baja definitiva el proceso y eliminarlo de la lista administrada por PM2:
 
 ```bash
-pm2 delete gestionthibe
+pm2 delete linsse_stock
 ```
 
 Cuando necesites una vista en tiempo real del consumo y la salud de la aplicación puedes ejecutar `pm2 monitor`. Si quieres que el servicio se vuelva a levantar automáticamente tras reiniciar el sistema, guarda la configuración con `pm2 save` y habilita el servicio de inicio automático siguiendo la [guía oficial](https://pm2.keymetrics.io/docs/usage/startup/).
@@ -88,8 +88,8 @@ un proceso escuchando en ese puerto (generalmente otra instancia previa del back
 
    ```bash
    pm2 list
-   pm2 stop gestionthibe    # o el nombre que le hayas dado al proceso
-   pm2 delete gestionthibe  # si querés eliminarlo por completo
+   pm2 stop linsse_stock    # o el nombre que le hayas dado al proceso
+   pm2 delete linsse_stock  # si querés eliminarlo por completo
    ```
 
 2. Si el puerto continúa ocupado, identifica qué proceso lo está utilizando desde el sistema operativo y termínalo manualmente:
@@ -102,7 +102,7 @@ un proceso escuchando en ese puerto (generalmente otra instancia previa del back
    (En macOS puedes usar `lsof -i :3000` para obtener el PID.)
 
 3. Como alternativa temporal, modifica el puerto del backend exportando la variable `PORT` antes de iniciar PM2, por ejemplo
-   `PORT=4000 pm2 start src/index.js --name gestionthibe`.
+   `PORT=4000 pm2 start src/index.js --name linsse_stock`.
 
 Una vez liberado el puerto, vuelve a iniciar el servicio con `pm2 start` o `pm2 restart`.
 
@@ -128,8 +128,8 @@ La API también expone `GET /health` sin autenticación para health checks de pl
 | `NODE_ENV` | Entorno de ejecución. En `production` se bloquea el arranque si quedan secretos inseguros por defecto. | `development` |
 | `CORS_ORIGINS` | Lista separada por comas de orígenes permitidos para el frontend SaaS (por ejemplo `https://app.tudominio.com`). Si queda vacío, se mantiene el comportamiento abierto para desarrollo. | - |
 | `TRUST_PROXY` | Habilita `trust proxy` de Express cuando la API corre detrás de proxy o balanceador con TLS terminado externamente. | `false` |
-| `MONGO_URI` | Cadena de conexión a MongoDB. Si incluye usuario/contraseña asegurate de agregar los parámetros necesarios (p. ej. `authSource`). | `mongodb://localhost:27017/gestionthibe` |
-| `MONGO_DB_NAME` | Nombre de la base de datos a utilizar cuando se provee la URI sin sufijo o se necesita forzar otra base. | `gestionthibe` (si no se especifica en la URI) |
+| `MONGO_URI` | Cadena de conexión a MongoDB. Si incluye usuario/contraseña asegurate de agregar los parámetros necesarios (p. ej. `authSource`). | `mongodb://localhost:27017/linsse_stock` |
+| `MONGO_DB_NAME` | Nombre de la base de datos a utilizar cuando se provee la URI sin sufijo o se necesita forzar otra base. | `linsse_stock` (si no se especifica en la URI) |
 | `MONGO_USER` | Usuario para autenticarse contra MongoDB (alternativa a incrustarlo en la URI). | - |
 | `MONGO_PASSWORD` | Contraseña asociada al usuario anterior. | - |
 | `MONGO_AUTH_SOURCE` | Base de datos donde está definido el usuario (comúnmente `admin` en instalaciones con autenticación). | - |
@@ -209,13 +209,13 @@ Desde el directorio `backend/` podés ejecutar un script que distribuye el conte
 
 ```bash
 cd backend
-npm run seed:sample -- --uri mongodb://localhost:27017 --db gestionthibe --drop-existing
+npm run seed:sample -- --uri mongodb://localhost:27017 --db linsse_stock --drop-existing
 ```
 
 Opciones disponibles:
 
 - `--uri`: cadena de conexión a MongoDB (por defecto `mongodb://localhost:27017`).
-- `--db`: nombre de la base de datos destino (por defecto `gestionthibe`).
+- `--db`: nombre de la base de datos destino (por defecto `linsse_stock`).
 - `--file`: ruta alternativa al JSON a importar.
 - `--drop-existing`: elimina el contenido previo de cada colección antes de insertar los datos (recomendado para ambientes de prueba limpios).
 
@@ -228,7 +228,7 @@ Si preferís un enfoque manual, podés cargar el JSON completo en una colección
 
 ```bash
 mongoimport \
-  --uri "mongodb://localhost:27017/gestionthibe" \
+  --uri "mongodb://localhost:27017/linsse_stock" \
   --collection seedDataset \
   --file backend/docs/sample-dataset.json
 ```
@@ -240,7 +240,7 @@ La colección destino (`seedDataset` en el ejemplo) actúa como contenedor inter
 Si preferís realizar la importación desde **MongoDB Compass**, seguí estos pasos:
 
 1. Abrí Compass y conectate a tu instancia de MongoDB (por ejemplo `mongodb://localhost:27017`).
-2. En el panel izquierdo, creá o seleccioná la base de datos donde querés cargar los datos (por ejemplo `gestionthibe`).
+2. En el panel izquierdo, creá o seleccioná la base de datos donde querés cargar los datos (por ejemplo `linsse_stock`).
 3. Creá una colección vacía (por ejemplo `seedDataset`) y hacé clic en ella.
 4. En la barra superior elegí **Add Data** → **Import JSON or CSV file...**.
 5. Seleccioná el archivo `backend/docs/sample-dataset.json`, definí el formato como **JSON** y marcá la casilla **Import as Extended JSON**

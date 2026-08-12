@@ -37,13 +37,13 @@ Uso:
 
 Opciones:
   --uri <cadena>        Cadena de conexión a MongoDB (con o sin base de datos). Por defecto mongodb://localhost:27017
-  --db <nombre>         Nombre de la base de datos destino. Por defecto gestionthibe
+  --db <nombre>         Nombre de la base de datos destino. Por defecto linsse_stock
   --file <ruta>         Ruta al archivo JSON a importar. Por defecto backend/docs/sample-dataset.json
   --drop-existing       Elimina el contenido previo de cada colección antes de insertar los datos
   --help                Muestra este mensaje y termina
 
 Ejemplo:
-  npm run seed:sample -- --uri mongodb://localhost:27017 --db gestionthibe --drop-existing
+  npm run seed:sample -- --uri mongodb://localhost:27017 --db linsse_stock --drop-existing
 `);
 };
 
@@ -66,7 +66,7 @@ if (!fs.existsSync(datasetPath)) {
 }
 
 const uri = optionValue('--uri') || 'mongodb://localhost:27017';
-const dbName = optionValue('--db') || 'gestionthibe';
+const dbName = optionValue('--db') || 'linsse_stock';
 const dropExisting = hasFlag('--drop-existing');
 
 const iso8601Pattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;

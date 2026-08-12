@@ -24,7 +24,7 @@ const splitCsv = (value) =>
     : [];
 
 const nodeEnv = process.env.NODE_ENV || 'development';
-const defaultMongoDbName = process.env.MONGO_URI ? undefined : 'gestionthibe';
+const defaultMongoDbName = process.env.MONGO_URI ? undefined : 'linsse_stock';
 const jwtSecret = process.env.JWT_SECRET || 'development-secret';
 const isProduction = nodeEnv === 'production';
 
@@ -40,7 +40,7 @@ const config = {
   nodeEnv,
   isProduction,
   port: parseInt(process.env.PORT || '3000', 10),
-  mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/gestionthibe',
+  mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/linsse_stock',
   mongo: {
     uri: process.env.MONGO_URI,
     dbName: process.env.MONGO_DB_NAME || defaultMongoDbName,

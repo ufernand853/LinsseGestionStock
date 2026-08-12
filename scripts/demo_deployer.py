@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Automate demo deployment tasks for GestionThibe."""
+"""Automate demo deployment tasks for Linsse Gestion Stock."""
 from __future__ import annotations
 
 import argparse
@@ -16,9 +16,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 BACKEND_DIR = REPO_ROOT / "backend"
 FRONTEND_DIR = REPO_ROOT / "frontend"
 
-DOCKER_MONGO_URI = "mongodb://admin:admin123@localhost:27017/gestionthibe?authSource=admin"
-LOCAL_MONGO_URI = "mongodb://localhost:27017/gestionthibe"
-DOCKER_CONTAINER_NAME = "gestionthibe-mongo"
+DOCKER_MONGO_URI = "mongodb://admin:admin123@localhost:27017/linsse_stock?authSource=admin"
+LOCAL_MONGO_URI = "mongodb://localhost:27017/linsse_stock"
+DOCKER_CONTAINER_NAME = "linsse-stock-mongo"
 DEFAULT_PACKAGE_PATH = REPO_ROOT / "dist" / "demo-package.zip"
 
 
@@ -210,7 +210,7 @@ def ensure_local_mongodb_service() -> str:
         )
         sys.exit(1)
 
-    print("MongoDB instalado/preparado. La URI por defecto será mongodb://localhost:27017/gestionthibe")
+    print("MongoDB instalado/preparado. La URI por defecto será mongodb://localhost:27017/linsse_stock")
     return LOCAL_MONGO_URI
 
 
