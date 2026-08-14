@@ -112,6 +112,44 @@ button:hover:not(:disabled) {
   gap: 0.65rem;
 }
 
+.sidebar-help {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  border: 1px solid rgba(134, 239, 172, 0.38);
+  border-radius: 10px;
+  color: #f0fdf4;
+  background: rgba(22, 163, 74, 0.2);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.sidebar-help:hover,
+.sidebar-help:focus-visible {
+  border-color: rgba(134, 239, 172, 0.75);
+  background: rgba(22, 163, 74, 0.38);
+}
+
+.sidebar-help__icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: 0 0 auto;
+  fill: currentColor;
+}
+
+.sidebar-help span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.sidebar-help small {
+  color: #bbf7d0;
+  font-size: 0.75rem;
+}
+
 .sidebar-license {
   display: flex;
   flex-direction: column;
@@ -938,6 +976,11 @@ th {
 
   .sidebar-footer {
     display: none;
+  }
+
+  .sidebar-help {
+    flex: 0 0 auto;
+    margin: 0;
   }
 }
 
