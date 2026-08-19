@@ -341,6 +341,10 @@ curl -i https://stock.linsse.com/health
 
 La aplicación incluye un flujo inicial de contratación SaaS:
 
+Los planes pagos incluyen una prueba gratuita de 7 días. El cliente registra el medio de pago en Mercado Pago al crear
+la cuenta y el primer cobro se agenda para cuando termine el período de prueba. La fecha se guarda en el tenant y se
+expone en la licencia.
+
 - `GET /api/public/plans`: lista los planes activos.
 - `POST /api/public/register`: crea tenant, usuario administrador y, para planes pagos, genera una suscripción en Mercado Pago.
 - `POST /api/webhooks/mercadopago`: recibe notificaciones de Mercado Pago y actualiza la suscripción/licencia.
@@ -358,6 +362,7 @@ MERCADOPAGO_SUCCESS_URL=https://stock.linsse.com/pago/exitoso
 MERCADOPAGO_PENDING_URL=https://stock.linsse.com/pago/pendiente
 MERCADOPAGO_FAILURE_URL=https://stock.linsse.com/pago/error
 MERCADOPAGO_NOTIFICATION_URL=https://stock.linsse.com/api/webhooks/mercadopago
+BILLING_TRIAL_DAYS=7
 ```
 
 Para probar con credenciales `TEST-`, copiá las credenciales de prueba desde la cuenta productiva/principal de

@@ -45,7 +45,7 @@ export default function RegisterTenantPage() {
       <Link to="/planes" className="secondary-link">← Volver a planes</Link>
       <section className="section-card">
         <h1>Crear cuenta SaaS</h1>
-        <p>La cuenta se crea separada por empresa. Luego Mercado Pago Uruguay confirma la suscripción.</p>
+        <p>Probá el sistema durante {selectedPlan?.trialDays || 7} días. Mercado Pago valida el medio de pago ahora y realiza el primer cobro al finalizar la prueba.</p>
         {selectedPlan ? <p className="license-pill">Plan {selectedPlan.name}: {formatPlanPrice(selectedPlan)}</p> : null}
         {error ? <div className="error-message">{error}</div> : null}
         {result && !result.checkoutUrl ? <div className="success-message">{result.message}</div> : null}
@@ -72,7 +72,7 @@ export default function RegisterTenantPage() {
               {plans.map(plan => <option key={plan.code} value={plan.code}>{plan.name} - {formatPlanPrice(plan)}</option>)}
             </select>
           </div>
-          <button type="submit" disabled={loading}>{loading ? 'Creando...' : 'Crear cuenta y pagar'}</button>
+          <button type="submit" disabled={loading}>{loading ? 'Creando...' : 'Comenzar prueba gratis'}</button>
         </form>
       </section>
     </main>

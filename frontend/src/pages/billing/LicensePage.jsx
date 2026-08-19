@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import useApi from '../../hooks/useApi.js';
 import { formatLicensePlan, formatLicensePrice } from '../../utils/license.js';
 
+function formatDate(value) {
+  return value ? new Intl.DateTimeFormat('es-UY', { dateStyle: 'long' }).format(new Date(value)) : 'No aplica';
+}
+
 export default function LicensePage() {
   const api = useApi();
   const [data, setData] = useState(null);
@@ -26,6 +30,7 @@ export default function LicensePage() {
             <div><span>Plan</span><strong>{formatLicensePlan(license)}</strong></div>
             <div><span>Precio</span><strong>{formatLicensePrice(license) || 'A medida'}</strong></div>
             <div><span>Estado</span><strong>{license.status}</strong></div>
+            <div><span>Fin de prueba</span><strong>{formatDate(license.trialEndsAt)}</strong></div>
             <div><span>Productos usados</span><strong>{data.usedProducts}{limit ? ` / ${limit}` : ' / sin límite'}</strong></div>
             <div><span>Suscripción</span><strong>{data.subscription?.status || 'Sin suscripción automática'}</strong></div>
           </div>

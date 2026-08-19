@@ -36,7 +36,7 @@ async function mercadoPagoRequest(path, { method = 'GET', body } = {}) {
   return data;
 }
 
-async function createSubscription({ tenant, plan, payerEmail }) {
+function buildSubscriptionPayload({ tenant, plan, payerEmail }) {
   const amount = plan.priceAmount ?? plan.priceUsdMonthly;
   if (!amount || amount <= 0) {
     throw new HttpError(400, 'El plan seleccionado no tiene precio mensual automático.');
@@ -51,7 +51,11 @@ async function createSubscription({ tenant, plan, payerEmail }) {
       frequency: 1,
       frequency_type: plan.billingPeriod || 'months',
       transaction_amount: amount,
-      currency_id: plan.currency || config.mercadoPago.currency
+      currency_id: plan.currency || config.mercadoPago.currency,
+      free_trial: {
+        frequency: config.billingTrialDays,
+        frequency_type: 'days'
+      }
     },
     back_url: config.mercadoPago.successUrl || buildBackUrl('/pago/exitoso'),
     status: 'pending'
@@ -61,6 +65,12 @@ async function createSubscription({ tenant, plan, payerEmail }) {
   if (notificationUrl) {
     body.notification_url = notificationUrl;
   }
+
+  return body;
+}
+
+async function createSubscription({ tenant, plan, payerEmail }) {
+  const body = buildSubscriptionPayload({ tenant, plan, payerEmail });
 
   return mercadoPagoRequest('/preapproval', { method: 'POST', body });
 }
@@ -80,4 +90,4 @@ function getSubscriptionCheckoutUrl(subscription) {
   return subscription.init_point || subscription.sandbox_init_point || null;
 }
 
-module.exports = { createSubscription, getSubscription, getSubscriptionCheckoutUrl };
+module.exports = { buildSubscriptionPayload, createSubscription, getSubscription, getSubscriptionCheckoutUrl };

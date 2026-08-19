@@ -159,6 +159,7 @@ export default function PricingPage() {
                 </div>
                 <h2>{plan.name}</h2>
                 <strong className="pricing-price">{formatPlanPrice(plan)}</strong>
+                <p className="license-pill">{plan.trialDays} días gratis · cobro al finalizar</p>
                 <p>{plan.description}</p>
                 <span className="pricing-limit">{formatPlanLimit(plan)}</span>
                 <button type="button" onClick={() => navigate(`/registro?plan=${plan.code}`)}>

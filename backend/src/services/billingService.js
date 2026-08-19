@@ -9,6 +9,11 @@ const { HttpError } = require('../utils/errors');
 const mercadoPagoService = require('./mercadoPagoService');
 const { serializePlan } = require('./licenseSerializer');
 const { ensureTenantSeedData } = require('./tenantProvisioningService');
+const config = require('../config');
+
+function createTrialEndDate(startedAt = new Date()) {
+  return new Date(startedAt.getTime() + config.billingTrialDays * 24 * 60 * 60 * 1000);
+}
 
 function mapMercadoPagoStatus(status) {
   switch (status) {
@@ -47,7 +52,8 @@ async function createMercadoPagoSubscription({ tenant, plan, payerEmail }) {
     rawProviderData: mpSubscription
   });
   tenant.mercadoPagoSubscriptionId = subscription.providerSubscriptionId;
-  tenant.subscriptionStatus = mapMercadoPagoStatus(mpSubscription.status).tenant;
+  const mappedTenantStatus = mapMercadoPagoStatus(mpSubscription.status).tenant;
+  tenant.subscriptionStatus = tenant.trialEndsAt > new Date() && mappedTenantStatus === 'active' ? 'trialing' : mappedTenantStatus;
   await tenant.save();
   return subscription;
 }
@@ -117,7 +123,8 @@ async function registerTenant({ companyName, billingEmail, username, password, p
     name: companyName,
     billingEmail: normalizedEmail,
     plan: plan.id,
-    subscriptionStatus: plan.priceAmount ? 'trialing' : 'active'
+    subscriptionStatus: plan.priceAmount ? 'trialing' : 'active',
+    trialEndsAt: plan.priceAmount ? createTrialEndDate() : null
   });
   await ensureTenantSeedData(tenant.id);
 
@@ -166,7 +173,8 @@ async function refreshMercadoPagoSubscription(preapprovalId, payload = null) {
   ).populate('tenant plan');
 
   if (subscription?.tenant) {
-    subscription.tenant.subscriptionStatus = mapped.tenant;
+    const trialIsActive = subscription.tenant.trialEndsAt && subscription.tenant.trialEndsAt > new Date();
+    subscription.tenant.subscriptionStatus = trialIsActive && mapped.tenant === 'active' ? 'trialing' : mapped.tenant;
     subscription.tenant.currentPeriodEndsAt = subscription.currentPeriodEndsAt;
     await subscription.tenant.save();
   }
@@ -194,4 +202,4 @@ async function recordWebhook({ eventType, externalId, payload }) {
   return event;
 }
 
-module.exports = { listPublicPlans, registerTenant, recordWebhook, refreshMercadoPagoSubscription };
+module.exports = { createTrialEndDate, listPublicPlans, registerTenant, recordWebhook, refreshMercadoPagoSubscription };
