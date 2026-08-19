@@ -3,6 +3,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const { HttpError } = require('../utils/errors');
 const billingService = require('../services/billingService');
 const EnterpriseLead = require('../models/EnterpriseLead');
+const config = require('../config');
 
 const router = express.Router();
 
@@ -26,13 +27,15 @@ router.post(
         name: result.plan.name,
         priceAmount: result.plan.priceAmount,
         currency: result.plan.currency,
-        productLimit: result.plan.productLimit
+        productLimit: result.plan.productLimit,
+        trialDays: result.plan.priceAmount ? config.billingTrialDays : 0
       },
       checkoutUrl: result.checkoutUrl,
       subscriptionId: result.subscription?.id || null,
       providerSubscriptionId: result.subscription?.providerSubscriptionId || null,
+      trialEndsAt: result.tenant.trialEndsAt,
       message: result.checkoutUrl
-        ? 'Cuenta creada. Redirigí al cliente a Mercado Pago para activar la suscripción.'
+        ? `Cuenta creada. Completá el registro en Mercado Pago; el primer cobro será después de los ${config.billingTrialDays} días de prueba.`
         : 'Cuenta creada. El plan requiere contacto comercial para activar la licencia.'
     });
   })

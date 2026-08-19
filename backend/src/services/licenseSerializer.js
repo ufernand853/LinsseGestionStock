@@ -1,3 +1,5 @@
+const config = require('../config');
+
 function serializePlan(plan) {
   if (!plan) {
     return null;
@@ -13,6 +15,7 @@ function serializePlan(plan) {
     description: plan.description,
     ctaLabel: plan.ctaLabel,
     billingPeriod: plan.billingPeriod,
+    trialDays: plan.priceAmount ? config.billingTrialDays : 0,
     isActive: plan.isActive
   };
 }

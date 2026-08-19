@@ -59,6 +59,7 @@ const config = {
   adminEmail: process.env.ADMIN_EMAIL || 'admin@example.com',
   adminPassword: process.env.ADMIN_PASSWORD || 'ChangeMe123!',
   publicAppUrl: process.env.PUBLIC_APP_URL || '',
+  billingTrialDays: parseInt(process.env.BILLING_TRIAL_DAYS || '7', 10),
   mercadoPago: {
     accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || '',
     publicKey: process.env.MERCADOPAGO_PUBLIC_KEY || '',
