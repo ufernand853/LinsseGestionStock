@@ -1120,14 +1120,15 @@ th {
 }
 
 .pricing-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.85fr);
+  display: flex;
+  flex-direction: column;
   align-items: start;
   gap: 1.25rem;
 }
 
 .pricing-grid--self-service {
-  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
 }
 
 .pricing-card {
@@ -1142,6 +1143,9 @@ th {
 }
 
 .pricing-card--enterprise-contact {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.55fr) minmax(240px, 0.8fr) minmax(300px, 1fr);
+  width: 100%;
   border-color: #c4b5fd;
   background: linear-gradient(180deg, #fff 0%, #faf5ff 100%);
 }
@@ -1189,6 +1193,10 @@ th {
 
 .pricing-card-visual--enterprise {
   background: linear-gradient(135deg, #ede9fe 0%, #a78bfa 100%);
+}
+
+.pricing-card-visual--custom {
+  background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 100%);
 }
 
 .pricing-card-visual--default {
@@ -1269,8 +1277,8 @@ th {
 }
 
 @media (max-width: 980px) {
-  .pricing-layout,
-  .pricing-grid--self-service {
+  .pricing-grid--self-service,
+  .pricing-card--enterprise-contact {
     grid-template-columns: 1fr;
   }
 }
@@ -1764,14 +1772,45 @@ th {
 }
 
 .public-hero--branded {
-  max-width: 880px;
-  gap: 0.25rem;
+  max-width: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
   padding: clamp(1.35rem, 3vw, 2rem);
   border: 1px solid rgba(191, 219, 254, 0.9);
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.76);
   box-shadow: 0 28px 80px -55px rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(10px);
+}
+
+.public-hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.public-hero__benefits {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.4rem;
+  border: 1px solid #dbeafe;
+  border-radius: 20px;
+  color: #334155;
+  background: linear-gradient(145deg, #eff6ff, #fff);
+}
+
+.public-hero__benefits strong {
+  color: #0f172a;
+  font-size: 1.15rem;
+}
+
+@media (max-width: 720px) {
+  .public-hero--branded {
+    grid-template-columns: 1fr;
+  }
 }
 
 .features-hero__content {

@@ -7,7 +7,7 @@ const enterpriseLeadSchema = new mongoose.Schema(
     email: { type: String, required: true, lowercase: true, trim: true },
     phone: { type: String, trim: true },
     message: { type: String, trim: true },
-    planCode: { type: String, default: 'ENTERPRISE' },
+    planCode: { type: String, default: 'CUSTOM' },
     source: { type: String, default: 'pricing' },
     status: {
       type: String,

@@ -17,8 +17,13 @@ const planVisuals = {
   },
   ENTERPRISE: {
     icon: '🏢',
-    label: 'Operación empresarial con múltiples sucursales',
+    label: 'Operación empresarial de gran escala',
     className: 'pricing-card-visual--enterprise'
+  },
+  CUSTOM: {
+    icon: '✨',
+    label: 'Una solución diseñada a medida',
+    className: 'pricing-card-visual--custom'
   }
 };
 
@@ -46,7 +51,7 @@ const commercialFeatures = [
   }
 ];
 
-const selfServicePlanCodes = ['BASIC', 'PRO'];
+const selfServicePlanCodes = ['BASIC', 'PRO', 'ENTERPRISE'];
 const enterpriseHighlights = [
   'Integración con plataformas de e-commerce',
   'Acompañamiento para adaptar flujos a medida',
@@ -89,8 +94,8 @@ export default function PricingPage() {
   const selfServicePlans = selfServicePlanCodes
     .map(code => plans.find(plan => plan.code === code))
     .filter(Boolean);
-  const enterprisePlan = plans.find(plan => plan.code === 'ENTERPRISE');
-  const enterpriseVisual = enterprisePlan ? getPlanVisual(enterprisePlan.code) : null;
+  const customPlan = plans.find(plan => plan.code === 'CUSTOM');
+  const customVisual = customPlan ? getPlanVisual(customPlan.code) : null;
 
   async function handleEnterpriseContactSubmit(event) {
     event.preventDefault();
@@ -116,17 +121,25 @@ export default function PricingPage() {
   return (
     <main className="public-page">
       <section className="public-hero public-hero--branded">
-        <BrandLogo />
-        <span className="public-eyebrow">SaaS de stock</span>
-        <h1>Elegí el plan para tu empresa</h1>
-        <p>Registrá tu cuenta y empezá a gestionar productos, ubicaciones, usuarios y mucho más.</p>
-        <div className="public-hero-actions">
-          <Link to="/funcionalidades" className="secondary-link">Ver funcionalidades</Link>
-          <Link to="/login" className="secondary-link">Ya tengo cuenta</Link>
-          <a className="whatsapp-link" href={whatsappContactUrl} target="_blank" rel="noreferrer" aria-label="Contactar por WhatsApp al equipo comercial">
-            <WhatsAppIcon />
-            <span>Contactar por WhatsApp</span>
-          </a>
+        <div className="public-hero__content">
+          <BrandLogo />
+          <span className="public-eyebrow">SaaS de stock</span>
+          <h1>El plan justo para hacer crecer tu empresa</h1>
+          <p>Empezá con 7 días gratis y gestioná productos, ubicaciones y usuarios desde un solo lugar.</p>
+          <div className="public-hero-actions">
+            <Link to="/funcionalidades" className="secondary-link">Ver funcionalidades</Link>
+            <Link to="/login" className="secondary-link">Ya tengo cuenta</Link>
+            <a className="whatsapp-link" href={whatsappContactUrl} target="_blank" rel="noreferrer" aria-label="Contactar por WhatsApp al equipo comercial">
+              <WhatsAppIcon />
+              <span>Hablar con ventas</span>
+            </a>
+          </div>
+        </div>
+        <div className="public-hero__benefits" aria-label="Beneficios de todos los planes">
+          <strong>Todo listo para empezar</strong>
+          <span>✓ 7 días de prueba gratis</span>
+          <span>✓ Sin costos de instalación</span>
+          <span>✓ Soporte de nuestro equipo</span>
         </div>
       </section>
 
@@ -169,16 +182,16 @@ export default function PricingPage() {
             );
           })}
         </div>
-        {enterprisePlan && enterpriseVisual ? (
+        {customPlan && customVisual ? (
           <aside className="pricing-card pricing-card--enterprise-contact">
-            <div className={`pricing-card-visual ${enterpriseVisual.className}`} aria-label={enterpriseVisual.label} role="img">
-              <span className="pricing-card-icon">{enterpriseVisual.icon}</span>
+            <div className={`pricing-card-visual ${customVisual.className}`} aria-label={customVisual.label} role="img">
+              <span className="pricing-card-icon">{customVisual.icon}</span>
             </div>
             <div>
-              <h2>{enterprisePlan.name}</h2>
-              <strong className="pricing-price">{formatPlanPrice(enterprisePlan)}</strong>
-              <p>{enterprisePlan.description}</p>
-              <span className="pricing-limit">{formatPlanLimit(enterprisePlan)}</span>
+              <h2>{customPlan.name}</h2>
+              <strong className="pricing-price">{formatPlanPrice(customPlan)}</strong>
+              <p>{customPlan.description}</p>
+              <span className="pricing-limit">{formatPlanLimit(customPlan)}</span>
               <ul className="pricing-enterprise-highlights" aria-label="Beneficios del plan a medida">
                 {enterpriseHighlights.map(highlight => (
                   <li key={highlight}>{highlight}</li>

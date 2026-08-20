@@ -69,7 +69,7 @@ export default function RegisterTenantPage() {
           <div className="input-group">
             <label htmlFor="planCode">Plan</label>
             <select id="planCode" name="planCode" value={form.planCode} onChange={handleChange}>
-              {plans.map(plan => <option key={plan.code} value={plan.code}>{plan.name} - {formatPlanPrice(plan)}</option>)}
+              {plans.filter(plan => plan.priceAmount != null).map(plan => <option key={plan.code} value={plan.code}>{plan.name} - {formatPlanPrice(plan)}</option>)}
             </select>
           </div>
           <button type="submit" disabled={loading}>{loading ? 'Creando...' : 'Comenzar prueba gratis'}</button>
