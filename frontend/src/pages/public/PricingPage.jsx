@@ -52,6 +52,12 @@ const commercialFeatures = [
 ];
 
 const selfServicePlanCodes = ['BASIC', 'PRO', 'ENTERPRISE'];
+const publicPlanDefaults = [
+  { code: 'BASIC', name: 'Básico', priceAmount: 390, currency: 'UYU', productLimit: 100, description: 'Para pequeñas empresas', ctaLabel: 'Contratar', trialDays: 7 },
+  { code: 'PRO', name: 'Pro', priceAmount: 1990, currency: 'UYU', productLimit: 500, description: 'Para equipos en crecimiento', ctaLabel: 'Contratar', trialDays: 7 },
+  { code: 'ENTERPRISE', name: 'Empresarial', priceAmount: 3990, currency: 'UYU', productLimit: 2000, description: 'Para operaciones con un inventario de gran escala', ctaLabel: 'Contratar', trialDays: 7 },
+  { code: 'CUSTOM', name: 'A medida', priceAmount: null, currency: 'UYU', productLimit: null, description: 'Sin límites, con integraciones y varias sucursales', ctaLabel: 'Solicitar demo', trialDays: 0 }
+];
 const enterpriseHighlights = [
   'Integración con plataformas de e-commerce',
   'Acompañamiento para adaptar flujos a medida',
@@ -91,10 +97,24 @@ export default function PricingPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Algunas instalaciones conservan el antiguo ENTERPRISE sin precio, que en
+  // el catálogo actual corresponde a CUSTOM. Normalizarlo acá evita que una
+  // base todavía no migrada oculte los planes nuevos en la página pública.
+  const legacyCustomPlan = plans.find(plan => plan.code === 'ENTERPRISE' && plan.priceAmount == null);
+  const normalizedPlans = publicPlanDefaults.map(defaultPlan => {
+    const apiPlan = plans.find(plan => plan.code === defaultPlan.code);
+    if (defaultPlan.code === 'CUSTOM' && !apiPlan && legacyCustomPlan) {
+      return { ...defaultPlan, ...legacyCustomPlan, code: 'CUSTOM', name: defaultPlan.name };
+    }
+    if (defaultPlan.code === 'ENTERPRISE' && legacyCustomPlan) {
+      return defaultPlan;
+    }
+    return apiPlan ? { ...defaultPlan, ...apiPlan } : defaultPlan;
+  });
   const selfServicePlans = selfServicePlanCodes
-    .map(code => plans.find(plan => plan.code === code))
+    .map(code => normalizedPlans.find(plan => plan.code === code))
     .filter(Boolean);
-  const customPlan = plans.find(plan => plan.code === 'CUSTOM');
+  const customPlan = normalizedPlans.find(plan => plan.code === 'CUSTOM');
   const customVisual = customPlan ? getPlanVisual(customPlan.code) : null;
 
   async function handleEnterpriseContactSubmit(event) {
@@ -136,10 +156,9 @@ export default function PricingPage() {
           </div>
         </div>
         <div className="public-hero__benefits" aria-label="Beneficios de todos los planes">
-          <strong>Todo listo para empezar</strong>
-          <span>✓ 7 días de prueba gratis</span>
-          <span>✓ Sin costos de instalación</span>
-          <span>✓ Soporte de nuestro equipo</span>
+          <span><b>7 días</b> de prueba gratis</span>
+          <span><b>$ 0</b> de instalación</span>
+          <span><b>Soporte</b> de nuestro equipo</span>
         </div>
       </section>
 
