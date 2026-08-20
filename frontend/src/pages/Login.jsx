@@ -26,6 +26,8 @@ const commercialFeatures = [
   }
 ];
 
+const whatsappHelpUrl = 'https://wa.me/59898682749?text=Hola%2C%20tengo%20un%20problema%20para%20ingresar%20a%20Linsse%20Stock';
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, user, initializing } = useAuth();
@@ -114,6 +116,9 @@ export default function LoginPage() {
           <p className="auth-card__footer">
             ¿No tenés cuenta? <Link to="/planes">Ver planes</Link>
           </p>
+          <a className="auth-card__whatsapp" href={whatsappHelpUrl} target="_blank" rel="noreferrer">
+            ¿Tenés problemas para ingresar? Contactanos por WhatsApp
+          </a>
         </section>
       </div>
     </main>

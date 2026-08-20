@@ -5,21 +5,55 @@ const { HttpError } = require('../utils/errors');
 const Item = require('../models/Item');
 const Subscription = require('../models/Subscription');
 const SubscriptionPlan = require('../models/SubscriptionPlan');
+const Tenant = require('../models/Tenant');
+const User = require('../models/User');
+const config = require('../config');
 const { serializePlan } = require('../services/licenseSerializer');
 
 const router = express.Router();
 
-const PLAN_MANAGER_EMAIL = 'admin@linsse.com';
-
 function requirePlanManager(req, res, next) {
   requireAuth(req, res, () => {
     const userEmail = String(req.user?.email || '').trim().toLowerCase();
-    if (userEmail !== PLAN_MANAGER_EMAIL) {
-      throw new HttpError(403, 'Solo admin@linsse.com puede gestionar planes');
+    if (userEmail !== config.adminEmail.toLowerCase()) {
+      throw new HttpError(403, 'Solo el administrador principal puede gestionar la plataforma');
     }
     next();
   });
 }
+
+router.get(
+  '/registrations',
+  requirePlanManager,
+  asyncHandler(async (req, res) => {
+    const tenants = await Tenant.find({}).populate('plan').sort({ createdAt: -1 }).lean();
+    const tenantIds = tenants.map(tenant => tenant._id);
+    const users = await User.find({ tenant: { $in: tenantIds } }).select('tenant username email status lastLoginAt createdAt').lean();
+    const usersByTenant = new Map();
+    for (const user of users) {
+      const key = String(user.tenant);
+      const current = usersByTenant.get(key) || [];
+      current.push(user);
+      usersByTenant.set(key, current);
+    }
+    res.json(tenants.map(tenant => {
+      const tenantUsers = usersByTenant.get(String(tenant._id)) || [];
+      const owner = tenantUsers.find(user => user.email === tenant.billingEmail) || tenantUsers[0] || null;
+      return {
+        id: String(tenant._id),
+        companyName: tenant.name,
+        billingEmail: tenant.billingEmail,
+        username: owner?.username || null,
+        plan: tenant.plan ? { code: tenant.plan.code, name: tenant.plan.name } : null,
+        subscriptionStatus: tenant.subscriptionStatus,
+        registeredAt: tenant.createdAt,
+        trialEndsAt: tenant.trialEndsAt,
+        lastLoginAt: owner?.lastLoginAt || null,
+        userCount: tenantUsers.length
+      };
+    }));
+  })
+);
 
 function normalizeNullableNumber(value, fieldName, { integer = false, min = 0 } = {}) {
   if (value === undefined) {

@@ -33,6 +33,26 @@ function mapMercadoPagoStatus(status) {
   }
 }
 
+function normalizeRegistrationInput({ companyName, billingEmail, username, password, planCode } = {}) {
+  const normalized = {
+    companyName: String(companyName || '').trim(),
+    billingEmail: String(billingEmail || '').trim().toLowerCase(),
+    username: String(username || '').trim(),
+    password: String(password || ''),
+    planCode: String(planCode || '').trim().toUpperCase()
+  };
+  if (Object.values(normalized).some(value => !value)) {
+    throw new HttpError(400, 'Empresa, email, usuario, contrasena y plan son obligatorios');
+  }
+  if (!/^\S+@\S+\.\S+$/.test(normalized.billingEmail)) {
+    throw new HttpError(400, 'El email no es valido');
+  }
+  if (normalized.password.length < 8) {
+    throw new HttpError(400, 'La contrasena debe tener al menos 8 caracteres');
+  }
+  return normalized;
+}
+
 async function listPublicPlans() {
   const plans = await SubscriptionPlan.find({ isActive: true }).sort({ priceAmount: 1, productLimit: 1 });
   return plans.map(serializePlan);
@@ -104,12 +124,8 @@ async function retryExistingRegistration({ existingUser, companyName, password, 
   };
 }
 
-async function registerTenant({ companyName, billingEmail, username, password, planCode }) {
-  if (!companyName || !billingEmail || !username || !password || !planCode) {
-    throw new HttpError(400, 'Empresa, email, usuario, contrasena y plan son obligatorios');
-  }
-  const normalizedEmail = billingEmail.toLowerCase().trim();
-  const normalizedPlanCode = planCode.toUpperCase().trim();
+async function registerTenant(input) {
+  const { companyName, username, password, planCode: normalizedPlanCode, billingEmail: normalizedEmail } = normalizeRegistrationInput(input);
   const plan = await SubscriptionPlan.findOne({ code: normalizedPlanCode, isActive: true });
   if (!plan) {
     throw new HttpError(400, 'Plan invalido o inactivo');
@@ -117,6 +133,10 @@ async function registerTenant({ companyName, billingEmail, username, password, p
   const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser) {
     return retryExistingRegistration({ existingUser, companyName, password, plan, payerEmail: normalizedEmail });
+  }
+  const existingUsername = await User.findOne({ username });
+  if (existingUsername) {
+    throw new HttpError(400, 'El nombre de usuario ya esta en uso');
   }
 
   const tenant = await Tenant.create({
@@ -202,4 +222,4 @@ async function recordWebhook({ eventType, externalId, payload }) {
   return event;
 }
 
-module.exports = { createTrialEndDate, listPublicPlans, registerTenant, recordWebhook, refreshMercadoPagoSubscription };
+module.exports = { createTrialEndDate, listPublicPlans, normalizeRegistrationInput, registerTenant, recordWebhook, refreshMercadoPagoSubscription };

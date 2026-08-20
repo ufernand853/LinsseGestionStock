@@ -21,6 +21,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
       id: user.id,
       username: user.username,
       email: user.email,
+      platformAdmin: user.email === config.adminEmail.toLowerCase(),
       role: user.role ? user.role.name : null,
       roleId: user.role ? user.role.id : null,
       permissions: user.role ? user.role.permissions : [],
