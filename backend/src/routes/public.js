@@ -54,7 +54,7 @@ router.post(
       email,
       phone,
       message,
-      planCode: 'ENTERPRISE',
+      planCode: 'CUSTOM',
       source: 'pricing'
     });
     res.status(201).json({

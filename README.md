@@ -146,11 +146,12 @@ La API también expone `GET /health` sin autenticación para health checks de pl
 
 ### Modelo inicial de licencias SaaS
 
-El backend crea tres planes base al iniciar:
+El backend crea cuatro planes base al iniciar:
 
 - **Básico**: USD 10/mes, hasta 100 productos.
 - **Pro**: USD 50/mes, hasta 500 productos.
-- **Empresa**: sin límite de productos, pensado para integraciones y varias sucursales.
+- **Empresarial**: hasta 2.000 productos y contratación autoservicio; su costo y condiciones se pueden editar desde la administración.
+- **Custom**: sin límite de productos, pensado para integraciones y múltiples sucursales con propuesta a medida.
 
 Cada usuario puede quedar asociado a una cuenta cliente (`Tenant`) y esa cuenta tiene un plan de suscripción. La respuesta de login/refresh incluye el bloque `license` con el nombre de la cuenta, estado de suscripción, plan, precio y límite de productos para que el frontend pueda mostrar la licencia activa. Al crear artículos, el backend valida el límite de productos del plan y devuelve un error si la cuenta ya alcanzó el máximo permitido.
 
@@ -389,7 +390,7 @@ Generá una suscripción nueva; los links de checkout creados antes del cambio m
 
 Rutas públicas del frontend:
 
-- `/planes`: muestra Básico, Pro y Empresa.
+- `/planes`: muestra Básico, Pro, Empresarial y Custom.
 - `/registro?plan=BASIC`: alta de empresa y administrador.
 - `/pago/exitoso`, `/pago/pendiente`, `/pago/error`: resultados de Mercado Pago.
 

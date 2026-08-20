@@ -16,23 +16,33 @@ const { ensureTenantSeedData } = require('./services/tenantProvisioningService')
 const defaultPlans = [
   { code: 'BASIC', name: 'Basico', priceUsdMonthly: 10, priceAmount: 390, currency: 'UYU', productLimit: 100, description: 'Para Pequeñas Empresas', ctaLabel: 'Contratar' },
   { code: 'PRO', name: 'Pro', priceUsdMonthly: 50, priceAmount: 1990, currency: 'UYU', productLimit: 500, description: 'Hasta 500 productos', ctaLabel: 'Contratar' },
-  { code: 'ENTERPRISE', name: 'Empresa', priceUsdMonthly: null, priceAmount: null, currency: 'UYU', productLimit: null, description: 'Sin limites, integraciones y varias sucursales', ctaLabel: 'Solicitar demo' }
+  { code: 'ENTERPRISE', name: 'Empresarial', priceUsdMonthly: 100, priceAmount: 3990, currency: 'UYU', productLimit: 2000, description: 'Para equipos con un inventario de gran escala', ctaLabel: 'Contratar' },
+  { code: 'CUSTOM', name: 'Custom', priceUsdMonthly: null, priceAmount: null, currency: 'UYU', productLimit: null, description: 'Sin límites, integraciones y múltiples sucursales', ctaLabel: 'Solicitar demo' }
 ];
 
 async function seedPlans() {
+  // Conserva las referencias de las instalaciones existentes al convertir el
+  // antiguo plan Empresa (a medida) en Custom antes de crear Empresarial.
+  const customPlan = await SubscriptionPlan.findOne({ code: 'CUSTOM' });
+  const legacyEnterprisePlan = await SubscriptionPlan.findOne({ code: 'ENTERPRISE' });
+  if (!customPlan && legacyEnterprisePlan && legacyEnterprisePlan.priceAmount == null) {
+    legacyEnterprisePlan.code = 'CUSTOM';
+    await legacyEnterprisePlan.save();
+  }
+
   for (const plan of defaultPlans) {
     await SubscriptionPlan.updateOne({ code: plan.code }, { $set: plan }, { upsert: true });
   }
 }
 
 async function ensureDefaultTenant() {
-  const enterprisePlan = await SubscriptionPlan.findOne({ code: 'ENTERPRISE' });
+  const customPlan = await SubscriptionPlan.findOne({ code: 'CUSTOM' });
   let tenant = await Tenant.findOne({ billingEmail: config.adminEmail });
   if (!tenant) {
     tenant = await Tenant.create({
       name: 'Cuenta principal',
       billingEmail: config.adminEmail,
-      plan: enterprisePlan.id,
+      plan: customPlan.id,
       subscriptionStatus: 'active'
     });
   }
