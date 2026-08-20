@@ -19,6 +19,7 @@ function serializeUser(userDoc) {
     id: userDoc.id,
     username: userDoc.username,
     email: userDoc.email,
+    platformAdmin: userDoc.email === config.adminEmail.toLowerCase(),
     roleId: role ? role.id : userDoc.role,
     role: role ? role.name : null,
     permissions: role ? role.permissions : [],

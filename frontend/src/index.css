@@ -1903,6 +1903,24 @@ th {
   font-weight: 800;
 }
 
+.auth-card__whatsapp {
+  display: block;
+  margin-top: 0.85rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #22c55e;
+  border-radius: 0.65rem;
+  color: #166534;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.auth-card__whatsapp:hover {
+  background: #dcfce7;
+  color: #14532d;
+}
+
 @media (max-width: 560px) {
   .brand-logo__image {
     width: 150px;

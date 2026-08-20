@@ -17,7 +17,8 @@ const NAV_ITEMS = [
   { to: '/audit', label: 'Auditoría', permission: 'stock.logs.read', hiddenForRoles: ['Operador'] },
   { to: '/users', label: 'Usuarios', permission: 'users.read', hiddenForRoles: ['Operador'] },
   { to: '/licencia', label: 'Mi licencia' },
-  { to: '/admin/planes', label: 'Planes', allowedEmails: ['admin@linsse.com'] }
+  { to: '/admin/planes', label: 'Planes', platformAdminOnly: true },
+  { to: '/admin/registros', label: 'Registrados', platformAdminOnly: true }
 ];
 
 const WHATSAPP_HELP_URL = 'https://wa.me/59898682749?text=Hola%2C%20necesito%20ayuda%20con%20Linsse%20Stock';
@@ -42,7 +43,7 @@ export default function Sidebar() {
       <div className="sidebar-header">Stock</div>
       <nav className="sidebar-nav">
         {NAV_ITEMS.filter(item => {
-          if (item.allowedEmails && !item.allowedEmails.includes(String(user?.email || '').toLowerCase())) {
+          if (item.platformAdminOnly && !user?.platformAdmin) {
             return false;
           }
           if (item.hiddenForRoles && role && item.hiddenForRoles.includes(role)) {
